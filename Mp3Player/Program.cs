@@ -1,4 +1,5 @@
-﻿using Mp3PlayerApp;
+﻿using Mp3Player;
+using Mp3Player.DataBase;
 
 const string path = @"C:\Users\alinf\RiderProjects\Mp3Player\Storage";
 var first = new Track("Логинов", 1);

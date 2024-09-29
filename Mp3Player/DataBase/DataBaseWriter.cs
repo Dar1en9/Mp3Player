@@ -1,6 +1,7 @@
-﻿namespace Mp3PlayerApp;
-using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
+
+namespace Mp3Player.DataBase;
+
 public class DataBaseWriter: IDataBaseWriter {
     private readonly string _path;
     public DataBaseWriter(string path) {

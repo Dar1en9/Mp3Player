@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Mp3PlayerApp;
+namespace Mp3Player.DataBase;
 
 public class DataBaseReader: IDataBaseReader {
     private readonly string _path;

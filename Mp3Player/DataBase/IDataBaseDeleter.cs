@@ -1,4 +1,4 @@
-﻿namespace Mp3PlayerApp;
+﻿namespace Mp3Player.DataBase;
 
 public interface IDataBaseDeleter
 {
