@@ -1,4 +1,4 @@
-﻿namespace Mp3Player;
+﻿namespace Mp3Player.History;
 
 public class HistoryManager: IHistoryManager
 {
@@ -9,13 +9,13 @@ public class HistoryManager: IHistoryManager
         _path = path;
     }
     
-    public void WriteHistory(string keyWord)
+    public async Task WriteHistory(string keyWord)
     {
-        File.WriteAllText(_path, keyWord);
+        await File.WriteAllTextAsync(_path, keyWord);
     }
-
-    public string GetHistory()
+    
+    public async Task<string> GetHistory()
     {
-        return File.ReadAllText(_path);
+        return await File.ReadAllTextAsync(_path);
     }
 }

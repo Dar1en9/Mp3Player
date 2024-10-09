@@ -1,7 +1,7 @@
-﻿namespace Mp3Player;
+﻿namespace Mp3Player.History;
 
 public interface IHistoryManager
 {
-    void WriteHistory(string keyWord);
-    string GetHistory();
+    Task WriteHistory(string keyWord);
+    Task<string>  GetHistory();
 }
