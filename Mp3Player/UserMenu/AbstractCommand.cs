@@ -1,13 +1,8 @@
-﻿using Mp3Player.DataBase;
+﻿namespace Mp3Player.UserMenu;
 
-namespace Mp3Player.UserMenu;
-
-public abstract class AbstractCommand<T>
+public interface AbstractCommand<T, in T1>
 {
-    protected IDataBaseReader DataBaseReader;
-    protected IDataBaseWriter DataBaseWriter;
-    protected IDataBaseDeleter DataBaseDeleter;
-    protected IHistoryManager HistoryManager;
-    public string? Description { get; protected init; }
-    public abstract T Execute();
+    public string? Description { get; }
+    public abstract Task<T> Execute(T1? arg = default);
+    
 }
