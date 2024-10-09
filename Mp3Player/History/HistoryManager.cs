@@ -8,6 +8,7 @@ public class HistoryManager: IHistoryManager
     {
         _path = path;
     }
+    
     public void WriteHistory(string keyWord)
     {
         File.WriteAllText(_path, keyWord);
