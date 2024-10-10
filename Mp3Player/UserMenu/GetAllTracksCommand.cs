@@ -1,14 +1,19 @@
-﻿namespace Mp3Player.UserMenu;
+﻿using Mp3Player.DataBase;
 
-public class GetAllTracksCommand: AbstractCommand<Task<bool>>
+namespace Mp3Player.UserMenu;
+
+public class GetAllTracksCommand: ICommand<List<Track>, string>
 {
-    public GetAllTracksCommand()
+    private readonly IDataBaseReader _dataBaseReader;
+    public string? Description { get; } = "Вывести все существующие треки";
+    
+    public GetAllTracksCommand(IDataBaseReader dataBaseReader)
     {
-        Description = "Вывести все существующие треки";
+        _dataBaseReader = dataBaseReader;
     }
-    public override async Task<bool> Execute()
+
+    public async Task<List<Track>> Execute(string? arg = default)
     {
-        await DataBaseReader.ReadAllTracks();
-        return false;
+        return await _dataBaseReader.ReadAllTracks();
     }
 }
