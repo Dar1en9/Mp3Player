@@ -19,11 +19,17 @@ const string path = @"C:\Users\alinf\RiderProjects\Mp3Player\Storage";
 //await writer.WriteTrack(sec);
 //await writer.WriteTrack(third);
 //var reader = new DataBaseReader(path);
-var getAll = new GetAllTracksCommand();
-Console.WriteLine(await getAll.Execute());
+//var getAll = new GetAllTracksCommand();
+//Console.WriteLine(await getAll.Execute());
 //var list = await reader.ReadAllTracks();
 //foreach (var l in list) Console.WriteLine(l);
 //var deleter = new DataBaseDeleter(path);
 //deleter.DeleteTrack(3);
 //var player = new Player();
+var dictionary = new Dictionary<int, IUniCommand<string>>
+{
+    {1, new ExitCommand()},
+    {2, new GetAllTracksCommand(new DataBaseReader(path))}
+};
+await new ShowMenuCommand(dictionary).Execute();
 
