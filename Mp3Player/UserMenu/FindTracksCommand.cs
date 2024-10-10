@@ -1,16 +1,19 @@
-﻿namespace Mp3Player.UserMenu;
+﻿using Mp3Player.DataBase;
+namespace Mp3Player.UserMenu;
 
-public class FindTracksCommand: AbstractCommand<Task<List<Track>>>
+public class FindTracksCommand: ICommand<List<Track>, string>
 {
     private readonly string _professor;
+    private readonly IDataBaseReader _dataBaseReader;
+    public string Description { get; } = "Найти трек по преподавателю";
 
-    public FindTracksCommand(string professor)
+    public FindTracksCommand(string professor, IDataBaseReader dataBaseReader)
     {
         _professor = professor;
-        Description = "Найти трек по фамилии преподавателя";
+        _dataBaseReader = dataBaseReader;
     }
-    public override async Task<List<Track>> Execute()
+    public async Task<List<Track>> Execute(string? arg = default)
     {
-        return await DataBaseReader.GetProfessorTracks(_professor);
+        return await _dataBaseReader.GetProfessorTracks(_professor);
     }
 }
