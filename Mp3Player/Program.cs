@@ -1,4 +1,5 @@
-﻿using Mp3Player.DataBase;
+﻿using System.Reflection;
+using Mp3Player.DataBase;
 using Mp3Player.MenuCommands;
 using Mp3Player.MenuCommands.UserMenu;
 using Mp3Player.TrackCreator;
@@ -9,7 +10,7 @@ var commands = [
 foreach(c in commands) c.historyManager =
 */
     
-const string path = @"C:\Users\user\RiderProjects\Mp3Player\Storage";
+ string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), Assembly.GetAssembly(typeof(Program)).GetName().Name);
 var first = new Track("Логинов", new TrackId());
 //var sec = new Track("Правдин", 2);
 //var third = new Track("Логинов", 3);
