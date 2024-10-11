@@ -1,4 +1,6 @@
-﻿namespace Mp3Player.DataBase;
+﻿using Mp3Player.TrackCreator;
+
+namespace Mp3Player.DataBase;
 
 public interface IDataBaseReader
 {
