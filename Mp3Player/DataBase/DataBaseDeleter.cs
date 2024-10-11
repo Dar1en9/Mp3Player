@@ -1,12 +1,18 @@
-﻿namespace Mp3Player.DataBase;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+namespace Mp3Player.DataBase;
 
 public class DataBaseDeleter {
     private readonly string _path;
+    
     public DataBaseDeleter(string path) {
         _path = path;
     }
 
-    public void DeleteTrack(int id) {
-        Directory.GetFiles(_path, $"{id}.json", SearchOption.AllDirectories).ToList().ForEach(File.Delete);
+    public async Task DeleteTrack(int id) {
+        var files = Directory.GetFiles(_path, $"{id}.json", SearchOption.AllDirectories);
+        var deleteTasks = files.Select(file => Task.Run(() => File.Delete(file)));
+        await Task.WhenAll(deleteTasks);
     }
 }
