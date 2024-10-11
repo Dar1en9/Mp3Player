@@ -12,4 +12,8 @@
       <PackageReference Include="System.Windows.Extensions" Version="9.0.0-rc.1.24431.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="MenuCommands\AdminMenu\" />
+    </ItemGroup>
+
 </Project>

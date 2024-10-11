@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Mp3Player.UserMenu;
+﻿namespace Mp3Player.MenuCommands.UserMenu;
 
 public class ShowMenuCommand: ICommand<bool, string>
 {

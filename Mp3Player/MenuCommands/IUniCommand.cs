@@ -1,4 +1,4 @@
-﻿namespace Mp3Player.UserMenu;
+﻿namespace Mp3Player.MenuCommands;
 
 public interface IUniCommand<in T1>
 {

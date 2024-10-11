@@ -1,8 +1,6 @@
-﻿using Mp3Player;
-using Mp3Player.DataBase;
-using Mp3Player.UserMenu;
-using NetCoreAudio;
-
+﻿using Mp3Player.DataBase;
+using Mp3Player.MenuCommands;
+using Mp3Player.MenuCommands.UserMenu;
 /*
 var commands = [
 

@@ -1,7 +1,7 @@
 ﻿using Mp3Player.DataBase;
 using Mp3Player.History;
 
-namespace Mp3Player.UserMenu;
+namespace Mp3Player.MenuCommands.UserMenu;
 
 public class GetHistoryCommand: ICommand<List<Track>, string>
 {
