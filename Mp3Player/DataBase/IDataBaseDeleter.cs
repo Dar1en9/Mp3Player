@@ -2,5 +2,5 @@
 
 public interface IDataBaseDeleter
 {
-    void DeleteTrack(int id);
+    Task DeleteTrack(int id);
 }
