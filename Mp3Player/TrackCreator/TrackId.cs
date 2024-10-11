@@ -2,5 +2,5 @@
 
 public record TrackId
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public string Id { get; init; } = Guid.NewGuid().ToString();
 }
