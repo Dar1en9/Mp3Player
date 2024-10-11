@@ -9,7 +9,7 @@ var commands = [
 foreach(c in commands) c.historyManager =
 */
     
-const string path = @"C:\Users\alinf\RiderProjects\Mp3Player\Storage";
+const string path = @"C:\Users\user\RiderProjects\Mp3Player\Storage";
 var first = new Track("Логинов", new TrackId());
 //var sec = new Track("Правдин", 2);
 //var third = new Track("Логинов", 3);
@@ -17,7 +17,7 @@ var writer = new DataBaseWriter(path);
 //await writer.WriteTrack(first);
 //await writer.WriteTrack(sec);
 //await writer.WriteTrack(third);
-//var reader = new DataBaseReader(path);
+var reader = new DataBaseReader(path);
 //var getAll = new GetAllTracksCommand();
 //Console.WriteLine(await getAll.Execute());
 //var list = await reader.ReadAllTracks();
@@ -34,6 +34,7 @@ var dictionary = new Dictionary<int, IUniCommand<string>>
 await new ShowMenuCommand(dictionary).Execute();
 */
 await writer.WriteTrack(first);
+await reader.GetProfessorTracks("Логинов");
 
 
 
