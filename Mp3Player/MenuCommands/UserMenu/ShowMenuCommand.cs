@@ -3,7 +3,7 @@
 public class ShowMenuCommand: ICommand<bool, string>
 {
     private readonly Dictionary<int, IUniCommand<string>> _commands;
-    public string? Description { get; } = "Список команд";
+    public string? Description { get; } = "Главное меню";
 
     public ShowMenuCommand(Dictionary<int, IUniCommand<string>> commands) 
     {
