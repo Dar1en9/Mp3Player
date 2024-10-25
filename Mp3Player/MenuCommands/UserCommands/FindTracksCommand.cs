@@ -1,7 +1,7 @@
 ﻿using Mp3Player.DataBase;
 using Mp3Player.TrackCreator;
 
-namespace Mp3Player.MenuCommands.UserMenu;
+namespace Mp3Player.MenuCommands.UserCommands;
 
 public class FindTracksCommand: ICommand<List<Track>, string>
 {

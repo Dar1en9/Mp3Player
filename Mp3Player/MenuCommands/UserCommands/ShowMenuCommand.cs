@@ -1,4 +1,4 @@
-﻿namespace Mp3Player.MenuCommands.UserMenu;
+﻿namespace Mp3Player.MenuCommands.UserCommands;
 
 public class ShowMenuCommand: ICommand<bool, string>
 {

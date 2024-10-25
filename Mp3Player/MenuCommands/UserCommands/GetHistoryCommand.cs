@@ -2,7 +2,7 @@
 using Mp3Player.History;
 using Mp3Player.TrackCreator;
 
-namespace Mp3Player.MenuCommands.UserMenu;
+namespace Mp3Player.MenuCommands.UserCommands;
 
 public class GetHistoryCommand: ICommand<List<Track>, string>
 {
