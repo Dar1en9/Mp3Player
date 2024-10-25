@@ -1,6 +1,6 @@
 ﻿using Mp3Player.DataBase;
 
-namespace Mp3Player.MenuCommands.AdminCommands;
+namespace Mp3Player.Menu.Commands.AdminCommands;
 
 public class DeleteTrackCommand: ICommand<bool, string>
 {

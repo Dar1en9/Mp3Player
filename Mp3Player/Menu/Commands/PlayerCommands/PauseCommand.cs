@@ -1,15 +1,15 @@
 ﻿using Mp3Player.TrackCreator;
 using NetCoreAudio;
 
-namespace Mp3Player.MenuCommands.PlayerCommands;
+namespace Mp3Player.Menu.Commands.PlayerCommands;
 
-public class StopCommand : ICommand<bool, string>
+public class PauseCommand : ICommand<bool, string>
 {
     private readonly Track _track;
     private readonly Player _player;
-    public string? Description { get; } = "Стоп";
+    public string? Description { get; } = "Пауза";
 
-    public StopCommand(Track track, Player player)
+    public PauseCommand(Track track, Player player)
     {
         _track = track;
         _player = player;
@@ -24,8 +24,8 @@ public class StopCommand : ICommand<bool, string>
     {
         try
         {
-            await _player.Stop();
-            Console.WriteLine("Воспроизведение завершено. Вы можете выбрать другой трек или вернуться в меню");
+            await _player.Pause();
+            Console.WriteLine("Трек на паузе");
         }
         catch (Exception ex)
         {

@@ -1,4 +1,4 @@
-﻿namespace Mp3Player.MenuCommands;
+﻿namespace Mp3Player.Menu.Commands;
 
 public class ExitCommand: ICommand<bool, string>
 { 

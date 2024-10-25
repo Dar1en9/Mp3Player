@@ -1,7 +1,7 @@
 ﻿using Mp3Player.TrackCreator;
 using NetCoreAudio;
 
-namespace Mp3Player.MenuCommands.PlayerCommands;
+namespace Mp3Player.Menu.Commands.PlayerCommands;
 
 public class PlayCommand : ICommand<bool, string>
 {
