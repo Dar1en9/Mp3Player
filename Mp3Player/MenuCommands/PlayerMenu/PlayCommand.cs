@@ -27,6 +27,7 @@ public class PlayCommand : ICommand<bool, string>
         try
         {
             await _player.Play(_track.audioPath);
+            Console.WriteLine("Трек воспроизводится");
         }
         catch (Exception ex)
         {
@@ -37,6 +38,7 @@ public class PlayCommand : ICommand<bool, string>
 
     private static void OnPlaybackFinished(object? sender, EventArgs e)
     {
-        Console.WriteLine("Воспроизведение завершено. Вы можете выбрать другой трек или вернуться в меню");
+        Console.WriteLine("Воспроизведение завершено. Вы можете выбрать другой трек или вернуться в меню"); //вернуть
+        //на страницу с найденными треками?
     }
 }
