@@ -1,7 +1,7 @@
 ﻿using Mp3Player.DataBase;
 using Mp3Player.TrackCreator;
 
-namespace Mp3Player.MenuCommands.AdminMenu;
+namespace Mp3Player.MenuCommands.AdminCommands;
 
 public class AddTrackCommand: ICommand<bool, string>
 {
