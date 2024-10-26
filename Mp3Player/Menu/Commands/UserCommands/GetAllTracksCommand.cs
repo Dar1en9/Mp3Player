@@ -13,9 +13,9 @@ public class GetAllTracksCommand: ICommand<List<Track>, string>
         _dataBaseReader = dataBaseReader;
     }
 
-    Task IUniCommand<string>.Execute(string? arg)
+    Task IUniCommand.Execute()
     {
-        return Execute(arg);
+        return Execute();
     }
     
     public async Task<List<Track>> Execute(string? arg = default)

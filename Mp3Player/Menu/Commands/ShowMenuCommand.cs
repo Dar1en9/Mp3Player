@@ -2,17 +2,17 @@
 
 public class ShowMenuCommand: ICommand<bool, string>
 {
-    private readonly Dictionary<int, IUniCommand<string>> _commands;
+    private readonly Dictionary<int, IUniCommand> _commands;
     public string? Description { get; } = "Доступные команды";
 
-    public ShowMenuCommand(Dictionary<int, IUniCommand<string>> commands) 
+    public ShowMenuCommand(Dictionary<int, IUniCommand> commands) 
     {
         _commands = commands;
     }
     
-    Task IUniCommand<string>.Execute(string? arg)
+    Task IUniCommand.Execute()
     {
-        return Execute(arg);
+        return Execute();
     }
     
     public async Task<bool> Execute(string? arg = default)

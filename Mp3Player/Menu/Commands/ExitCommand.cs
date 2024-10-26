@@ -4,9 +4,9 @@ public class ExitCommand: ICommand<bool, string>
 { 
     public string Description { get; } = "Выйти из приложения";
     
-    Task IUniCommand<string>.Execute(string? arg)
+    Task IUniCommand.Execute()
     {
-        return Execute(arg);
+        return Execute();
     }
     
     public Task<bool> Execute(string? arg = default)

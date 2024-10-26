@@ -1,7 +1,7 @@
 ﻿namespace Mp3Player.Menu.Commands;
 
-public interface IUniCommand<in T1>
+public interface IUniCommand
 {
     string? Description { get; }
-    Task Execute(T1? arg = default);
+    Task Execute();
 }

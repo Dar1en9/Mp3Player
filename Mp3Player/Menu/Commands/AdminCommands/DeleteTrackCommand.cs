@@ -14,9 +14,9 @@ public class DeleteTrackCommand: ICommand<bool, string>
         _dataBaseDeleter = dataBaseDeleter;
     }
     
-    Task IUniCommand<string>.Execute(string? arg)
+    Task IUniCommand.Execute()
     {
-        return Execute(arg);
+        return Execute();
     }
     
     public async Task<bool> Execute(string? arg = default)

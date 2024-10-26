@@ -15,9 +15,9 @@ public class AddTrackCommand: ICommand<bool, string>
         _dataBaseWriter = dataBaseWriter;
     }
     
-    Task IUniCommand<string>.Execute(string? arg)
+    Task IUniCommand.Execute()
     {
-        return Execute(arg);
+        return Execute();
     }
     
     public async Task<bool> Execute(string? arg = default)

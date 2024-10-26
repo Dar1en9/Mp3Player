@@ -16,9 +16,9 @@ public class GetHistoryCommand: ICommand<List<Track>, string>
         _historyManager = historyManager;
     }
 
-    Task IUniCommand<string>.Execute(string? arg)
+    Task IUniCommand.Execute()
     {
-        return Execute(arg);
+        return Execute();
     }
     
     public async Task<List<Track>> Execute(string? arg = default)
