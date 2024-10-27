@@ -2,6 +2,6 @@
 
 public interface ICommand<T, in T1>: IUniCommand
 { 
-    new Task<T> Execute(T1? arg = default);
+    Task<T> Execute(T1? arg = default);
     
 }
