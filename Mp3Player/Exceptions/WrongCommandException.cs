@@ -1,6 +1,6 @@
 ﻿namespace Mp3Player.Exceptions;
 
-public class WrongCommandException() : Exception("Неверная команда. Введите 0 для вывода списка доступных команд")
+public class WrongCommandException() : Exception("Неверная команда. Попробуйте снова")
 {
     public override string ToString()
     {
