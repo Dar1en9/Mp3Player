@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Mp3Player.InputReaders;
 
-public class PathReader : IPathReader<string>
+public class PathReader : IPathReader
 {
     public async Task<string> GetInput()
     {

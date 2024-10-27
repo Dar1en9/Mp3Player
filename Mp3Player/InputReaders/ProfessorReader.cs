@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Mp3Player.InputReaders;
 
-public partial class ProfessorReader : IProfessorReader<string>
+public partial class ProfessorReader : IProfessorReader
 {
     public async Task<string> GetInput()
     {
