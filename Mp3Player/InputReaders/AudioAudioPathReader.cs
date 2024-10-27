@@ -1,17 +1,18 @@
 ﻿using Mp3Player.Exceptions;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Mp3Player.InputReaders;
 
-public class PathReader : IPathReader
+public partial class AudioAudioPathReader : IAudioPathReader
 {
     public async Task<string> GetInput()
     {
         while (true)
         {
-            await Console.Out.WriteLineAsync("Введите полный путь файла:");
+            await Console.Out.WriteLineAsync("Введите полный путь аудиофайла:");
             var path = await Console.In.ReadLineAsync();
-            if (path != null && Path.IsPathFullyQualified(path)) return path;
+            if (path != null && MyRegex().IsMatch(path) && File.Exists(path)) return path;
             try
             {
                 throw new WrongInputException();
@@ -22,4 +23,7 @@ public class PathReader : IPathReader
             }
         }
     }
+
+    [GeneratedRegex(@"^.*\.(mp3|wav|flac|aac)$", RegexOptions.IgnoreCase, "ru-RU")]
+    private static partial Regex MyRegex();
 }
