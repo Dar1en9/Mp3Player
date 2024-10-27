@@ -7,7 +7,7 @@ namespace Mp3Player.Menu.Commands.UserCommands;
 
 public class FindTracksCommand: ICommand<List<Track>, string>
 {
-    private readonly IProfessorReader<string> _professorReader;
+    private readonly IProfessorReader _professorReader;
     private readonly IDataBaseReader _dataBaseReader;
     private readonly IHistoryManager _historyManager;
     public string Description { get; } = "Найти трек по преподавателю";
