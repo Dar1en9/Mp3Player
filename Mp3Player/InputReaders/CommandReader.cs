@@ -1,10 +1,10 @@
 ﻿using Mp3Player.Exceptions;
 
-namespace Mp3Player.Menu.Commands;
+namespace Mp3Player.InputReaders;
 
-public class CommandReader
+public class CommandReader : IReader<int>
 {
-    public async Task<int> getCommand()
+    public async Task<int> GetInput()
     {
         while (true)
         {
