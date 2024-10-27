@@ -1,4 +1,4 @@
-﻿namespace Mp3Player.TrackCreator;
+﻿namespace Mp3Player.TrackHandler;
 
 public class TrackId
 {
