@@ -1,13 +1,10 @@
 ﻿using Mp3Player.Exceptions;
-using Mp3Player.TrackHandler;
 using System.Text.RegularExpressions;
 
 namespace Mp3Player.InputReaders;
 
-public partial class ProfessorReader : IReader<string>
+public partial class ProfessorReader : IProfessorReader<string>
 {
-    private string? Professor { get; set; }
-    
     public async Task<string> GetInput()
     {
         while (true)

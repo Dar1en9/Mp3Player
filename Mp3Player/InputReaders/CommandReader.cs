@@ -2,7 +2,7 @@
 
 namespace Mp3Player.InputReaders;
 
-public class CommandReader : IReader<int>
+public class CommandReader : ICommandReader<int>
 {
     public async Task<int> GetInput()
     {
