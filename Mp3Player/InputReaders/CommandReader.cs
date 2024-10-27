@@ -9,7 +9,7 @@ public class CommandReader : ICommandReader
         while (true)
         {
             var command = await Console.In.ReadLineAsync();
-            if (int.TryParse(command, out var key)) return key;
+            if (int.TryParse(command, out var key) && key >= 0) return key;
             try
             {
                 throw new WrongCommandException();
