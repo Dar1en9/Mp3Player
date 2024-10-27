@@ -15,9 +15,9 @@ public partial class AudioAudioPathReader : IAudioPathReader
             if (path != null && MyRegex().IsMatch(path) && File.Exists(path)) return path;
             try
             {
-                throw new WrongInputException();
+                throw new WrongDirectoryException();
             }
-            catch (WrongCommandException e)
+            catch (WrongDirectoryException e)
             {
                 Console.WriteLine(e.Message);
             }
