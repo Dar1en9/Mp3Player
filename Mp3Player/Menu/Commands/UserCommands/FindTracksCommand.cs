@@ -5,7 +5,7 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;
 
-public class FindTracksCommand: ICommand<List<Track>, string>
+public class FindTracksCommand: ITrackListCommand
 {
     private readonly IProfessorReader _professorReader;
     private readonly IDataBaseReader _dataBaseReader;

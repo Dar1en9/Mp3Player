@@ -3,7 +3,7 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;
 
-public class GetAllTracksCommand: ICommand<List<Track>, string>
+public class GetAllTracksCommand: ITrackListCommand
 {
     private readonly IDataBaseReader _dataBaseReader;
     public string? Description { get; } = "Вывести все существующие треки";

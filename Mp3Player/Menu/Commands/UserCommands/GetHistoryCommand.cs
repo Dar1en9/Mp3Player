@@ -4,7 +4,7 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;
 
-public class GetHistoryCommand: ICommand<List<Track>, string>
+public class GetHistoryCommand: ITrackListCommand
 {
     private readonly IDataBaseReader _dataBaseReader;
     private readonly IHistoryManager _historyManager;
