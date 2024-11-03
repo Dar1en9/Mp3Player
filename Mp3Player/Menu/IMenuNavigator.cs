@@ -1,10 +1,8 @@
-﻿using Mp3Player.TrackHandler;
+﻿using Mp3Player.Menu.UserMenu;
 
 namespace Mp3Player.Menu;
 
 public interface IMenuNavigator
 {
-    void NavigateToTrackList(List<Track> tracks);
-    void NavigateToPlayer(Track track);
-    void NavigateToMainMenu();
+    Task NavigateTo(IMenu menu);
 }
