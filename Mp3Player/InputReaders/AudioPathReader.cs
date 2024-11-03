@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Mp3Player.InputReaders;
 
-public partial class AudioAudioPathReader : IAudioPathReader
+public partial class AudioPathReader : IAudioPathReader
 {
     public async Task<string> GetInput()
     {
