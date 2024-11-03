@@ -1,13 +1,15 @@
-﻿namespace Mp3Player.Menu.Commands;
+﻿using Mp3Player.Menu.Buttons;
+
+namespace Mp3Player.Menu.Commands;
 
 public class ShowMenuCommand: ICommand<bool, string>
 {
-    private readonly Dictionary<int, IUniCommand> _commands;
+    private readonly Dictionary<int, IButton> _buttons;
     public string? Description { get; } = "Доступные команды";
 
-    public ShowMenuCommand(Dictionary<int, IUniCommand> commands) 
+    public ShowMenuCommand(Dictionary<int, IButton> buttons) 
     {
-        _commands = commands;
+        _buttons = buttons;
     }
     
     Task IUniCommand.Execute()
@@ -17,9 +19,9 @@ public class ShowMenuCommand: ICommand<bool, string>
     
     public async Task<bool> Execute(string? arg = default)
     {
-        await Console.Out.WriteLineAsync(Description + ":");
-        foreach (var command in _commands) 
-            await Console.Out.WriteLineAsync($"{command.Key}: {command.Value.Description}"); 
+        await Console.Out.WriteLineAsync("Введите номер команды. " + Description + ":");
+        foreach (var button in _buttons) 
+            await Console.Out.WriteLineAsync($"{button.Key}: {button.Value.Label}"); 
         return true;
     }
 }
