@@ -3,15 +3,14 @@ using NetCoreAudio;
 
 namespace Mp3Player.Menu.Commands.PlayerCommands;
 
-public class PlayCommand : ICommand<bool, string>
+public class PlayCommand : ICommand<bool, Track>
 {
-    private readonly Track _track;
     private readonly Player _player;
-    public string? Description { get; } = "Воспроизведение";
+    public Func<object?, EventArgs, Task>? OnPlaybackFinished { get; set; }
+    public string Description => "Воспроизведение";
 
-    public PlayCommand(Track track, Player player)
+    public PlayCommand(Player player)
     {
-        _track = track;
         _player = player;
     }
     
@@ -20,25 +19,29 @@ public class PlayCommand : ICommand<bool, string>
         return Execute();
     }
     
-    public async Task<bool> Execute(string? arg = default)
+    public async Task<bool> Execute(Track? track = default)
     {
-        _player.PlaybackFinished -= OnPlaybackFinished; // Отписка от события
-        _player.PlaybackFinished += OnPlaybackFinished; // Подписка на событие
+        if (OnPlaybackFinished != null)
+        {
+            _player.PlaybackFinished -= OnPlaybackFinishedWrapper; // Отписка от события
+            _player.PlaybackFinished += OnPlaybackFinishedWrapper; // Подписка на событие
+        }
+
         try
         {
-            await _player.Play(_track.audioPath);
+            await _player.Play(track!.AudioPath);
             Console.WriteLine("Трек воспроизводится");
         }
         catch (Exception ex)
         {
+            //сделать логи
             Console.WriteLine(ex.Message);
         }
         return true;
     }
 
-    private static void OnPlaybackFinished(object? sender, EventArgs e)
+    private async void OnPlaybackFinishedWrapper(object? sender, EventArgs e)
     {
-        Console.WriteLine("Воспроизведение завершено. Вы можете выбрать другой трек или вернуться в меню"); //вернуть
-        //на страницу с найденными треками?
+        if (OnPlaybackFinished != null) await OnPlaybackFinished(sender, e); 
     }
 }
