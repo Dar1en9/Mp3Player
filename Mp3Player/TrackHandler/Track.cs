@@ -1,2 +1,2 @@
 ﻿namespace Mp3Player.TrackHandler;
-public record Track(string Professor, TrackId Id, string audioPath);
+public record Track(string Professor, TrackId Id, string AudioPath);
