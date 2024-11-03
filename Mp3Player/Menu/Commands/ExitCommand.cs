@@ -2,8 +2,8 @@
 
 public class ExitCommand: ICommand<bool, string>
 { 
-    public string Description { get; } = "Выйти из приложения";
-    
+    public string Description => "Выйти из приложения";
+
     Task IUniCommand.Execute()
     {
         return Execute();
