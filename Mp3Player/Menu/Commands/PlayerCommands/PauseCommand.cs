@@ -5,13 +5,11 @@ namespace Mp3Player.Menu.Commands.PlayerCommands;
 
 public class PauseCommand : ICommand<bool, string>
 {
-    private readonly Track _track;
     private readonly Player _player;
-    public string? Description { get; } = "Пауза";
+    public string Description => "Пауза";
 
-    public PauseCommand(Track track, Player player)
+    public PauseCommand(Player player)
     {
-        _track = track;
         _player = player;
     }
     
