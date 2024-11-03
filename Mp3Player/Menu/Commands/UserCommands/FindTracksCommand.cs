@@ -5,13 +5,13 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;
 
-public class FindTracksCommand: ITrackListCommand
+public class FindTracksCommand: ICommand<List<Track>, string>
 {
     private readonly IProfessorReader _professorReader;
     private readonly IDataBaseReader _dataBaseReader;
     private readonly IHistoryManager _historyManager;
-    public string Description { get; } = "Найти трек по преподавателю";
-    
+    public string Description => "Найти трек по преподавателю";
+
     public FindTracksCommand(IProfessorReader professorReader, IDataBaseReader dataBaseReader, IHistoryManager historyManager)
     {
         _professorReader = professorReader;
