@@ -1,6 +1,4 @@
-﻿using Mp3Player.Menu.UserMenu;
-
-namespace Mp3Player.Menu;
+﻿namespace Mp3Player.Menu;
 
 public class MenuNavigator : IMenuNavigator
 {
