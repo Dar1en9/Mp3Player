@@ -2,20 +2,20 @@
 
 public class HistoryManager: IHistoryManager
 {
-    private readonly string _path;
+    private readonly string _fullPath;
 
     public HistoryManager(string path)
     {
-        _path = path;
+        _fullPath = Path.Combine(path, "history.txt");;
     }
     
     public async Task WriteHistory(string keyWord)
     {
-        await File.WriteAllTextAsync(_path, keyWord);
+        await File.WriteAllTextAsync(_fullPath, keyWord);
     }
     
     public async Task<string> GetHistory()
     {
-        return await File.ReadAllTextAsync(_path);
+        return await File.ReadAllTextAsync(_fullPath);
     }
 }
