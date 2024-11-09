@@ -17,9 +17,9 @@ public partial class AudioPathReader : IAudioPathReader
             {
                 throw new WrongDirectoryException();
             }
-            catch (WrongDirectoryException e)
+            catch (WrongDirectoryException ex)
             {
-                Console.WriteLine(e.Message);
+                await Console.Out.WriteLineAsync(ex.Message);
             }
         }
     }

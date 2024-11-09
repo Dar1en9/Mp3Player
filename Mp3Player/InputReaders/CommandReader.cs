@@ -14,9 +14,9 @@ public class CommandReader : ICommandReader
             {
                 throw new WrongCommandException();
             }
-            catch (WrongCommandException e)
+            catch (WrongCommandException ex)
             {
-                Console.WriteLine(e.Message);
+                await Console.Out.WriteLineAsync(ex.Message);
             }
         }
     }
