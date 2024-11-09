@@ -12,13 +12,8 @@ namespace Mp3Player.Menu;
 
 public class UserMenu
 {
-    private const string Path = @"C:\Users\user\RiderProjects\Mp3Player\Storage";
-    private const string HistoryPath = @"C:\Users\user\RiderProjects\Mp3Player\history.txt";
-    private readonly DataBaseReader _dataBaseReader;
-    private readonly ProfessorReader _professorReader;
-    private readonly CommandReader _commandReader;
-    private readonly HistoryManager _historyManager;
-    private readonly Player _player;
+    private readonly string _path; //= @"C:\Users\user\RiderProjects\Mp3Player\Storage";
+    private readonly string _historyPath; //= @"C:\Users\user\RiderProjects\Mp3Player\history.txt";
     private readonly FindTracksCommand _findTrackCommand;
     private readonly GetAllTracksCommand _getAllTracksCommand;
     private readonly GetHistoryCommand _getHistoryCommand;
@@ -32,25 +27,27 @@ public class UserMenu
     private readonly Menu _mainMenu;
     private readonly Menu _playerMenu;
 
-    public UserMenu()
+    public UserMenu(string storagePath, string historyPath)
     {
-        _dataBaseReader = new DataBaseReader(Path);
-        _professorReader = new ProfessorReader();
-        _commandReader = new CommandReader();
-        _historyManager = new HistoryManager(HistoryPath);
-        _player = new Player();
-        _findTrackCommand = new FindTracksCommand(_professorReader, _dataBaseReader, _historyManager);
-        _getAllTracksCommand = new GetAllTracksCommand(_dataBaseReader);
-        _getHistoryCommand = new GetHistoryCommand(_dataBaseReader, _historyManager);
+        _path = storagePath;
+        _historyPath = historyPath;
+        var dataBaseReader = new DataBaseReader(_path);
+        var professorReader = new ProfessorReader();
+        var commandReader = new CommandReader();
+        var historyManager = new HistoryManager(_historyPath);
+        var player = new Player();
+        _findTrackCommand = new FindTracksCommand(professorReader, dataBaseReader, historyManager);
+        _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader);
+        _getHistoryCommand = new GetHistoryCommand(dataBaseReader, historyManager);
         _exitCommand = new ExitCommand();
-        _playCommand = new PlayCommand(_player);
-        _pauseCommand = new PauseCommand(_player);
-        _resumeCommand = new ResumeCommand(_player);
-        _stopCommand = new StopCommand(_player);
+        _playCommand = new PlayCommand(player);
+        _pauseCommand = new PauseCommand(player);
+        _resumeCommand = new ResumeCommand(player);
+        _stopCommand = new StopCommand(player);
         _menuNavigator = new MenuNavigator();
-        _trackListPage = new Menu("Список треков по вашему запросу", _commandReader);
-        _mainMenu = new Menu("Главное меню", _commandReader);
-        _playerMenu = new Menu("Плеер", _commandReader);
+        _trackListPage = new Menu("Список треков по вашему запросу", commandReader);
+        _mainMenu = new Menu("Главное меню", commandReader);
+        _playerMenu = new Menu("Плеер", commandReader);
         Init();
     }
     
