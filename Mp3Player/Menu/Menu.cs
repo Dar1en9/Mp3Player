@@ -1,9 +1,8 @@
 ﻿using Mp3Player.Exceptions;
 using Mp3Player.InputReaders;
 using Mp3Player.Menu.Buttons;
-using Mp3Player.Menu.Commands.UserCommands;
 
-namespace Mp3Player.Menu.UserMenu;
+namespace Mp3Player.Menu;
 
 public class Menu : IMenu
 {
@@ -39,14 +38,15 @@ public class Menu : IMenu
         {
             var key = await _commandReader.GetInput();
             try
-            {
-                if (Buttons!.TryGetValue(key, out var button)) return button;
+            {   
+                if (Buttons == null) throw new NullReferenceException();
+                if (Buttons.TryGetValue(key, out var button)) return button;
                 throw new WrongCommandException();
             }
             catch (WrongCommandException ex)
             {
                 //сделать логи
-                Console.WriteLine(ex.Message);
+                await Console.Out.WriteLineAsync(ex.Message);
             }
             catch (NullReferenceException)
             {
@@ -64,7 +64,8 @@ public class Menu : IMenu
         await Console.Out.WriteLineAsync("Введите номер команды:");
         try
         {
-            foreach (var button in Buttons!)
+            if (Buttons == null) throw new NullReferenceException();
+            foreach (var button in Buttons)
                 await Console.Out.WriteLineAsync($"{button.Key}: {button.Value.Label}");
         }
         catch (NullReferenceException)
