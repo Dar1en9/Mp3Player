@@ -6,7 +6,6 @@ using Mp3Player.Menu.Buttons;
 using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.Menu.Commands;
 using Mp3Player.Menu.Commands.PlayerCommands;
-using Mp3Player.Menu.UserMenu;
 using NetCoreAudio;
 
 
@@ -56,14 +55,7 @@ var pauseCommand = new PauseCommand(player);
 var resumeCommand = new ResumeCommand(player);
 var stopCommand = new StopCommand(player);
 
-/*
-var dictionary = new Dictionary<int, IUniCommand>
-{
-    {1, exitCommand},
-    {2, getAllTracksCommand},
-    {3, findTrackCommand},
-};
-*/
+
 var menuNavigator = new MenuNavigator();
 var trackListPage = new Menu("Список треков по вашему запросу", commandReader);
 var mainMenu = new Menu("Главное меню", commandReader);
@@ -82,7 +74,7 @@ var findTracksButton = new Button(findTrackCommand.Description, async () =>
 {
     var tracks = await findTrackCommand.Execute();
     var buttons = tracks.Select(track => 
-            new Button(track.Id.ToString(), async () => 
+            new Button(track.TrackName, async () => //для админа в label пойдет ещё и track.Id.ToString()
             {
                 await playCommand.Execute(track); 
                 await menuNavigator.NavigateTo(playerMenu); 
@@ -154,13 +146,13 @@ var stopButton = new Button(stopCommand.Description, async () =>
     await menuNavigator.NavigateTo(trackListPage);
 });
 
-var trackListButtons = new Dictionary<int, IButton>
+var playerButtons = new Dictionary<int, IButton>
 {
     {1, pauseButton},
     {2, resumeButton},
     {3, stopButton}
 };
-trackListPage.Buttons = trackListButtons;
+playerMenu.Buttons = playerButtons;
 
 
     
