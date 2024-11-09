@@ -6,17 +6,21 @@ public class TrackCreator
 {
     private readonly IProfessorReader _professorReader;
     private readonly IAudioPathReader _audioPathReader;
-
-    public TrackCreator(IProfessorReader professorReader, IAudioPathReader audioPathReader)
+    private readonly IReader<string> _trackNameReader;
+    
+    public TrackCreator(IProfessorReader professorReader, IReader<string> trackNameReader, 
+        IAudioPathReader audioPathReader)
     {
         _professorReader = professorReader;
+        _trackNameReader = trackNameReader;
         _audioPathReader = audioPathReader;
     }
 
     public async Task<Track> NewTrack()
     {
-        var name = await _professorReader.GetInput();
+        var professor = await _professorReader.GetInput();
+        var trackName = await _trackNameReader.GetInput();
         var audioPath = await _audioPathReader.GetInput();
-        return new Track(name, new TrackId(), audioPath);
+        return new Track(professor, trackName, new TrackId(), audioPath);
     }
 }
