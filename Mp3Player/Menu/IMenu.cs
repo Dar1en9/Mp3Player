@@ -1,7 +1,6 @@
 ﻿using Mp3Player.Menu.Buttons;
-using Mp3Player.Menu.Commands;
 
-namespace Mp3Player.Menu.UserMenu;
+namespace Mp3Player.Menu;
 
 public interface IMenu
 {
