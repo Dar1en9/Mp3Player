@@ -1,4 +1,5 @@
 ﻿using Mp3Player.DataBase;
+using Mp3Player.Exceptions;
 using Mp3Player.History;
 using Mp3Player.InputReaders;
 using Mp3Player.Menu.Buttons;
@@ -53,8 +54,19 @@ public class UserMenu
     {
         _playCommand.OnPlaybackFinished = OnPlaybackFinished;
         var toMainMenuButton = new Button("В главное меню", async () => await _menuNavigator.NavigateTo(_mainMenu));
-        var findTracksButton = new Button(_findTrackCommand.Description, async () =>
-            await TracksToButtons(_findTrackCommand, toMainMenuButton));
+        var findTracksButton = new Button(_findTrackCommand.Description,
+            async () =>
+            {
+                try
+                {
+                    await TracksToButtons(_findTrackCommand, toMainMenuButton);
+                }
+                catch (MissClickException ex)
+                {
+                    await Console.Out.WriteLineAsync(ex.Message);
+                    await _menuNavigator.NavigateTo(_mainMenu);
+                }
+            });
         var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () => 
             await TracksToButtons(_getAllTracksCommand, toMainMenuButton));
         var getHistoryButton = new Button(_getHistoryCommand.Description, async () =>
