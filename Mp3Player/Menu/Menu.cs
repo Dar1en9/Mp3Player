@@ -19,9 +19,10 @@ public class Menu : IMenu
     public async Task<IMenu> Run()
     {
         Console.WriteLine("##" + _label);
-        var showMenuTask = ShowHelp();
-        var buttonClick = ButtonClick(await CommandHandler());
-        await Task.WhenAll(showMenuTask, buttonClick);
+        
+        await ShowHelp(); 
+        var button = await CommandHandler(); 
+        await ButtonClick(button); 
         return this;
     }
     
@@ -38,8 +39,16 @@ public class Menu : IMenu
         {
             var key = await _commandReader.GetInput();
             try
-            {   
-                if (Buttons == null) throw new NullReferenceException();
+            {
+                if (Buttons == null)
+                {
+                    Console.WriteLine("Кажется, в меню нечего делать :(");
+                    return new Button("", () =>
+                    {
+                        Environment.Exit(0);
+                        return Task.CompletedTask;
+                    });
+                }
                 if (Buttons.TryGetValue(key, out var button)) return button;
                 throw new WrongCommandException();
             }
@@ -48,30 +57,17 @@ public class Menu : IMenu
                 //сделать логи
                 await Console.Out.WriteLineAsync(ex.Message);
             }
-            catch (NullReferenceException)
-            {
-                Console.WriteLine("Кажется, в меню нечего делать :(");
-                return new Button("", () =>
-                {
-                    Environment.Exit(0);
-                    return Task.CompletedTask;
-                });
-            }
         }
     }
     public async Task ShowHelp()
     {
         await Console.Out.WriteLineAsync("Введите номер команды:");
-        try
-        {
-            if (Buttons == null) throw new NullReferenceException();
-            foreach (var button in Buttons)
-                await Console.Out.WriteLineAsync($"{button.Key}: {button.Value.Label}");
-        }
-        catch (NullReferenceException)
+        if (Buttons == null)
         {
             Console.WriteLine("Кажется, в меню нечего делать :(");
             Environment.Exit(0);
         }
+        foreach (var button in Buttons)
+            await Console.Out.WriteLineAsync($"{button.Key}: {button.Value.Label}");
     }
 }
