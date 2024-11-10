@@ -27,7 +27,7 @@ public class FindTracksCommand: ICommand<List<Track>, string>
     public async Task<List<Track>> Execute(string? arg = default)
     {
         var professor = await _professorReader.GetInput();
-        await _historyManager.WriteHistory(professor);   
+        await _historyManager.WriteHistory(professor);
         return await _dataBaseReader.GetProfessorTracks(professor);
     }
 }
