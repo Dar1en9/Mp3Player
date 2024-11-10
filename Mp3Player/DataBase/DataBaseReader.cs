@@ -20,8 +20,9 @@ public class DataBaseReader: IDataBaseReader {
     public async Task<List<Track>> GetProfessorTracks(string professorFolder) {
         var tracks = new List<Track>();
         var directory = Path.Combine(_path, professorFolder);
+        if (!Directory.Exists(directory)) return tracks;
         var tracksPaths = Directory.GetFiles(directory);
-        foreach (var trackPath in tracksPaths) 
+        foreach (var trackPath in tracksPaths)
             tracks.Add(await GetTrack(trackPath));
         return tracks;
     }
