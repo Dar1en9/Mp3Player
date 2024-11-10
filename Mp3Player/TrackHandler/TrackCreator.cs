@@ -1,8 +1,9 @@
-﻿using Mp3Player.InputReaders;
+﻿using Mp3Player.Exceptions;
+using Mp3Player.InputReaders;
 
 namespace Mp3Player.TrackHandler;
 
-public class TrackCreator
+public class TrackCreator: ITrackCreator
 {
     private readonly IProfessorReader _professorReader;
     private readonly IAudioPathReader _audioPathReader;
