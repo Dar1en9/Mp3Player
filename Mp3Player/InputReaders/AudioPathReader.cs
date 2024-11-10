@@ -12,7 +12,8 @@ public partial class AudioPathReader : IAudioPathReader
         {
             await Console.Out.WriteLineAsync("Введите полный путь аудиофайла:");
             var path = await Console.In.ReadLineAsync();
-            if (path != null && MyRegex().IsMatch(path) && File.Exists(path)) return path;
+            if (path == null) throw new MissClickException();
+            if (MyRegex().IsMatch(path) && File.Exists(path)) return path;
             try
             {
                 throw new WrongDirectoryException();
