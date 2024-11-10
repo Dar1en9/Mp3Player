@@ -25,12 +25,12 @@ public class UserMenu
     private readonly Menu _mainMenu;
     private readonly Menu _playerMenu;
 
-    public UserMenu(string storageDirectory, string historyFilePath)
+    public UserMenu(string storageDirectory, string historyDirectory)
     {
         var dataBaseReader = new DataBaseReader(storageDirectory);
         var professorReader = new ProfessorReader();
         var commandReader = new CommandReader();
-        var historyManager = new HistoryManager(historyFilePath);
+        var historyManager = new HistoryManager(historyDirectory);
         var player = new Player();
         _findTrackCommand = new FindTracksCommand(professorReader, dataBaseReader, historyManager);
         _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader);
@@ -97,7 +97,16 @@ public class UserMenu
     private async Task TracksToButtons(ICommand<List<Track>, string> command, 
         IButton navigationButton)
     {
-        var tracks = await command.Execute();
+        List<Track> tracks;
+        try
+        {
+            tracks = await command.Execute();
+        }
+        catch (FileNotFoundException)
+        {
+            //логи сделать
+            tracks = [];
+        }
         var buttons = tracks.Select(track => 
                 new Button(track.TrackName, async () => //для админа в label пойдет ещё и track.Id.ToString()
                 {
