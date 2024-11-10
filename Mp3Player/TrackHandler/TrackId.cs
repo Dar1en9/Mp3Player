@@ -2,7 +2,7 @@
 
 public class TrackId
 {
-    private Guid Id { get; init; } = Guid.NewGuid();
+    private Guid Id { get; } = Guid.NewGuid();
 
     public override string ToString() => Id.ToString();
 }
