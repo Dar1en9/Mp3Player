@@ -14,8 +14,6 @@ public class ProgramRunner: IProgramRunner
         if (!Directory.Exists(_path)) Directory.CreateDirectory(_path);
         var storagePath = Path.Combine(_path, "Storage");
         if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
-        var historyPath = Path.Combine(storagePath, "history.txt");
-        if (!File.Exists(historyPath)) await File.Create(historyPath).DisposeAsync();
-        await new UserMenu(storagePath, historyPath).Run();
+        await new UserMenu(storagePath, _path).Run();
     }
 }
