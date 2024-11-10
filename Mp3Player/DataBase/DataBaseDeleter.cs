@@ -1,16 +1,18 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Mp3Player.TrackHandler;
+
 namespace Mp3Player.DataBase;
 
-public class DataBaseDeleter {
+public class DataBaseDeleter: IDataBaseDeleter {
     private readonly string _path;
     
     public DataBaseDeleter(string path) {
         _path = path;
     }
 
-    public async Task DeleteTrack(int id) {
+    public async Task DeleteTrack(string id) {
         var files = Directory.GetFiles(_path, $"{id}.json", SearchOption.AllDirectories);
         var deleteTasks = files.Select(file => Task.Run(() => File.Delete(file)));
         await Task.WhenAll(deleteTasks);
