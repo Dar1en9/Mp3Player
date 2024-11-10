@@ -1,4 +1,3 @@
 ﻿using Mp3Player;
 
-await new ProgramRunner().Run();
-
+await new ProgramRunner(args).Run();
