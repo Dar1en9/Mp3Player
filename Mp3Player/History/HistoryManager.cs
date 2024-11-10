@@ -4,9 +4,9 @@ public class HistoryManager: IHistoryManager
 {
     private readonly string _fullPath;
 
-    public HistoryManager(string path)
+    public HistoryManager(string fullPath)
     {
-        _fullPath = Path.Combine(path, "history.txt");;
+        _fullPath = fullPath;
     }
     
     public async Task WriteHistory(string keyWord)
