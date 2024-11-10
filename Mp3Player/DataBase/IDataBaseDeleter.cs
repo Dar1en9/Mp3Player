@@ -1,6 +1,8 @@
-﻿namespace Mp3Player.DataBase;
+﻿using Mp3Player.TrackHandler;
+
+namespace Mp3Player.DataBase;
 
 public interface IDataBaseDeleter
 {
-    Task DeleteTrack(int id);
+    Task DeleteTrack(string id);
 }
