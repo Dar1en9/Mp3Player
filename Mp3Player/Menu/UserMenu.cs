@@ -12,8 +12,6 @@ namespace Mp3Player.Menu;
 
 public class UserMenu
 {
-    private readonly string _path; //= @"C:\Users\user\RiderProjects\Mp3Player\Storage";
-    private readonly string _historyPath; //= @"C:\Users\user\RiderProjects\Mp3Player\history.txt";
     private readonly FindTracksCommand _findTrackCommand;
     private readonly GetAllTracksCommand _getAllTracksCommand;
     private readonly GetHistoryCommand _getHistoryCommand;
@@ -27,14 +25,12 @@ public class UserMenu
     private readonly Menu _mainMenu;
     private readonly Menu _playerMenu;
 
-    public UserMenu(string storagePath, string historyPath)
+    public UserMenu(string storageDirectory, string historyFilePath)
     {
-        _path = storagePath;
-        _historyPath = historyPath;
-        var dataBaseReader = new DataBaseReader(_path);
+        var dataBaseReader = new DataBaseReader(storageDirectory);
         var professorReader = new ProfessorReader();
         var commandReader = new CommandReader();
-        var historyManager = new HistoryManager(_historyPath);
+        var historyManager = new HistoryManager(historyFilePath);
         var player = new Player();
         _findTrackCommand = new FindTracksCommand(professorReader, dataBaseReader, historyManager);
         _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader);
