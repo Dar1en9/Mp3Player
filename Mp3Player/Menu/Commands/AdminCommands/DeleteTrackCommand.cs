@@ -9,7 +9,7 @@ public class DeleteTrackCommand: ICommand<bool, string>
 {
     private readonly IReader<string> _idReader;
     private readonly IDataBaseDeleter _dataBaseDeleter;
-    public string? Description { get; } = "Удалить трек";
+    public string Description => "Удалить трек";
 
     public DeleteTrackCommand(IReader<string> idReader, IDataBaseDeleter dataBaseDeleter)
     {
@@ -27,14 +27,18 @@ public class DeleteTrackCommand: ICommand<bool, string>
         try
         {
             var trackId = await _idReader.GetInput();
-            await _dataBaseDeleter.DeleteTrack(trackId);
+            if (await _dataBaseDeleter.DeleteTrack(trackId)) return true; 
+            throw new NoDataFoundException();
         }
         catch (MissClickException ex)
         {
             await Console.Out.WriteLineAsync(ex.Message);
             return false;
         }
-
-        return true;
+        catch (NoDataFoundException ex)
+        {
+            await Console.Out.WriteLineAsync(ex.Message);
+            return false;
+        }
     }
 }
