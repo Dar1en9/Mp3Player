@@ -8,6 +8,7 @@ public class TrackNameReader: IReader<string>
     {
         await Console.Out.WriteLineAsync("Введите название трека:");
         var name = await Console.In.ReadLineAsync();
-        return name ?? throw new MissClickException();
+        if (string.IsNullOrWhiteSpace(name)) throw new MissClickException();
+        return name;
     }
 }

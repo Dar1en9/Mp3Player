@@ -8,6 +8,7 @@ public class IdReader: IReader<string>
     {
         await Console.Out.WriteLineAsync("Введите id трека для удаления:");
         var id = await Console.In.ReadLineAsync();
-        return id ?? throw new MissClickException();
+        if (string.IsNullOrWhiteSpace(id)) throw new MissClickException(); 
+        return id;
     }
 }

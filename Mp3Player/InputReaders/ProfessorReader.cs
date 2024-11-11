@@ -12,7 +12,7 @@ public partial class ProfessorReader : IProfessorReader
             await Console.Out.WriteLineAsync("Введите имя преподавателя в формате Фамилия И. О.:");
             var name = await Console.In.ReadLineAsync();
             var regex = MyRegex(); //регулярное выражение на основе паттерна
-            if (name == null) throw new MissClickException();
+            if (string.IsNullOrWhiteSpace(name)) throw new MissClickException();
             if (regex.IsMatch(name)) return name;
             try
             {
