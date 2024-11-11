@@ -1,4 +1,5 @@
-﻿using Mp3Player.TrackHandler;
+﻿using Mp3Player.Exceptions;
+using Mp3Player.TrackHandler;
 using NetCoreAudio;
 
 namespace Mp3Player.Menu.Commands.PlayerCommands;
@@ -26,17 +27,9 @@ public class PlayCommand : ICommand<bool, Track>
             _player.PlaybackFinished -= OnPlaybackFinishedWrapper; // Отписка от события
             _player.PlaybackFinished += OnPlaybackFinishedWrapper; // Подписка на событие
         }
-
-        try
-        {
-            await _player.Play(track!.AudioPath);
-            await Console.Out.WriteLineAsync("Трек воспроизводится");
-        }
-        catch (Exception ex)
-        {
-            //сделать логи
-            Console.WriteLine(ex.Message);
-        }
+        if (track == null || string.IsNullOrWhiteSpace(track.AudioPath) ||
+            !File.Exists(track.AudioPath)) throw new NoDataFoundException();
+        await _player.Play(track.AudioPath);
         return true;
     }
 
