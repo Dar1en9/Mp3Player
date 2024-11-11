@@ -41,17 +41,23 @@ public class AdminMenu
     {
         var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () =>
         {
-            await _getAllTracksCommand.Execute();
+            var tracks = await _getAllTracksCommand.Execute();
+            await Console.Out.WriteLineAsync("Список всех треков:");
+            foreach (var track in tracks) 
+                await Console.Out.WriteLineAsync($"{track.Professor} — {track.TrackName};" + 
+                                                 $" ID: {track.Id}");
             await _mainMenu.Run();
         });
-        var addTrackButton = new Button("Добавить трек",async () =>
+        var addTrackButton = new Button(_addTrackCommand.Description,async () =>
         {
-            await _addTrackCommand.Execute();
+           if (await _addTrackCommand.Execute())
+               await Console.Out.WriteLineAsync("Трек успешно добавлен");
             await _mainMenu.Run();
         });
-        var deleteTrackButton = new Button("Удалить трек",async () =>
-            {
-            await _deleteTrackCommand.Execute();
+        var deleteTrackButton = new Button(_deleteTrackCommand.Description,async () =>
+        {
+            if (await _deleteTrackCommand.Execute())
+                await Console.Out.WriteLineAsync("Трек успешно удалён");
             await _mainMenu.Run();
             });
         var exitButton = new Button(_exitCommand.Description, async () =>
