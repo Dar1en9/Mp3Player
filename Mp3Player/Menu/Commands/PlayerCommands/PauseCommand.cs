@@ -23,7 +23,6 @@ public class PauseCommand : ICommand<bool, string>
         try
         {
             await _player.Pause();
-            Console.WriteLine("Трек на паузе");
         }
         catch (Exception ex)
         {

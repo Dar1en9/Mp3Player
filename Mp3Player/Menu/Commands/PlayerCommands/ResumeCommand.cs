@@ -22,7 +22,6 @@ public class ResumeCommand : ICommand<bool, string>
         try
         {
             await _player.Resume();
-            Console.WriteLine("Трек возобновлен");
         }
         catch (Exception ex)
         {
