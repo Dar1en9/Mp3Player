@@ -18,13 +18,14 @@ public class UserMenu
     private readonly GetHistoryCommand _getHistoryCommand;
     private readonly ExitCommand _exitCommand;
     private readonly PlayCommand _playCommand;
-    private readonly PauseCommand _pauseCommand;
-    private readonly ResumeCommand _resumeCommand;
-    private readonly StopCommand _stopCommand;
     private readonly MenuNavigator _menuNavigator;
     private readonly Menu _trackListPage;
     private readonly Menu _mainMenu;
     private readonly Menu _playerMenu;
+    private readonly Player _player;
+    private readonly Button _pauseButton;
+    private readonly Button _resumeButton;
+    private readonly Button _stopButton;
 
     public UserMenu(string storageDirectory, string historyDirectory)
     {
@@ -32,19 +33,34 @@ public class UserMenu
         var professorReader = new ProfessorReader();
         var commandReader = new CommandReader();
         var historyManager = new HistoryManager(historyDirectory);
-        var player = new Player();
+        _player = new Player();
         _findTrackCommand = new FindTracksCommand(professorReader, dataBaseReader, historyManager);
         _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader);
         _getHistoryCommand = new GetHistoryCommand(dataBaseReader, historyManager);
         _exitCommand = new ExitCommand();
-        _playCommand = new PlayCommand(player);
-        _pauseCommand = new PauseCommand(player);
-        _resumeCommand = new ResumeCommand(player);
-        _stopCommand = new StopCommand(player);
+        _playCommand = new PlayCommand(_player);
+        var pauseCommand = new PauseCommand(_player);
+        var resumeCommand = new ResumeCommand(_player);
+        var stopCommand = new StopCommand(_player);
         _menuNavigator = new MenuNavigator();
         _trackListPage = new Menu("Список треков по вашему запросу", commandReader);
         _mainMenu = new Menu("Главное меню", commandReader);
         _playerMenu = new Menu("Плеер", commandReader);
+        _resumeButton = new Button(resumeCommand.Description, async () =>
+        {
+            await resumeCommand.Execute();
+            await UpdatePlayerButtons();
+        });
+        _pauseButton = new Button(pauseCommand.Description, async () =>
+        {
+            await pauseCommand.Execute();
+            await UpdatePlayerButtons();
+        });
+        _stopButton = new Button(stopCommand.Description, async () =>
+        {
+            await stopCommand.Execute();
+            await _menuNavigator.NavigateTo(_trackListPage);
+        });
         Init();
     }
     
@@ -53,7 +69,8 @@ public class UserMenu
     private void Init()
     {
         _playCommand.OnPlaybackFinished = OnPlaybackFinished;
-        var toMainMenuButton = new Button("В главное меню", async () => await _menuNavigator.NavigateTo(_mainMenu));
+        var toMainMenuButton = new Button("В главное меню", async () => 
+            await _menuNavigator.NavigateTo(_mainMenu));
         var findTracksButton = new Button(_findTrackCommand.Description,
             async () =>
             {
@@ -81,23 +98,16 @@ public class UserMenu
             {4, exitButton}
         };
         _mainMenu.Buttons = mainMenuButtons;
-    
-        var pauseButton = new Button(_pauseCommand.Description, async () =>
-            await _pauseCommand.Execute());
-        var resumeButton = new Button(_resumeCommand.Description, async () =>
-            await _resumeCommand.Execute());
-        var stopButton = new Button(_stopCommand.Description, async () =>
+    }
+
+    private async Task UpdatePlayerButtons()
+    {
+        _playerMenu.Buttons = new Dictionary<int, IButton>
         {
-            await _stopCommand.Execute();
-            await _menuNavigator.NavigateTo(_trackListPage);
-        });
-        var playerButtons = new Dictionary<int, IButton>
-        {
-            {1, pauseButton},
-            {2, resumeButton},
-            {3, stopButton}
+            {1, _player is { Playing: true, Paused: false } ? _pauseButton : _resumeButton},
+            {2, _stopButton}
         };
-        _playerMenu.Buttons = playerButtons; 
+        await _menuNavigator.NavigateTo(_playerMenu);
     }
     
     private async Task OnPlaybackFinished(object? sender, EventArgs e)
@@ -120,10 +130,17 @@ public class UserMenu
             tracks = [];
         }
         var buttons = tracks.Select(track => 
-                new Button(track.TrackName, async () => //для админа в label пойдет ещё и track.Id.ToString()
+                new Button($"{track.Professor} — {track.TrackName}", async () => 
                 {
-                    await _playCommand.Execute(track); 
-                    await _menuNavigator.NavigateTo(_playerMenu); 
+                    try
+                    {
+                        await _playCommand.Execute(track);
+                        await UpdatePlayerButtons();
+                    }
+                    catch (NoDataFoundException ex)
+                    {
+                        await _menuNavigator.NavigateTo(_trackListPage, ex.Message);
+                    }
                 }))
             .Select((button, index) => new { button, index })
             .ToDictionary(x => x.index + 1, IButton (x) => x.button);
