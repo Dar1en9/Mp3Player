@@ -8,7 +8,7 @@ public class AddTrackCommand: ICommand<bool, string>
 {
     private readonly ITrackCreator _trackCreator;
     private readonly IDataBaseWriter _dataBaseWriter;
-    public string? Description { get; } = "Добавить трек";
+    public string Description => "Добавить трек";
 
     public AddTrackCommand(ITrackCreator trackCreator, IDataBaseWriter dataBaseWriter)
     {
