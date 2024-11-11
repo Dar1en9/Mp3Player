@@ -4,9 +4,14 @@ namespace Mp3Player.DataBase;
 
 public class DataBaseReader: IDataBaseReader {
     private readonly string _path;
+    private readonly JsonSerializerOptions _options;
 
     public DataBaseReader(string path) {
         _path = path;
+        _options = new JsonSerializerOptions
+        {
+            Converters = { new TrackIdJsonConverter() }
+        };
     }
 
     public async Task<List<Track>> ReadAllTracks() {
@@ -29,6 +34,6 @@ public class DataBaseReader: IDataBaseReader {
     
     public async Task<Track> GetTrack(string trackPath) {
         await using var openStream = File.OpenRead(trackPath);
-        return await JsonSerializer.DeserializeAsync<Track>(openStream) ?? throw new InvalidOperationException();
+        return await JsonSerializer.DeserializeAsync<Track>(openStream, _options) ?? throw new InvalidOperationException();
     }
 }
