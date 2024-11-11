@@ -30,7 +30,7 @@ public class PlayCommand : ICommand<bool, Track>
         try
         {
             await _player.Play(track!.AudioPath);
-            Console.WriteLine("Трек воспроизводится");
+            await Console.Out.WriteLineAsync("Трек воспроизводится");
         }
         catch (Exception ex)
         {
