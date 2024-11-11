@@ -104,7 +104,8 @@ public class UserMenu
     {
         _playerMenu.Buttons = new Dictionary<int, IButton>
         {
-            {1, _player is { Playing: true, Paused: false } ? _pauseButton : _resumeButton},
+            {1, _player is { Playing: true, Paused: false } or 
+                { Playing: false } ? _pauseButton : _resumeButton},
             {2, _stopButton}
         };
         await _menuNavigator.NavigateTo(_playerMenu);
