@@ -6,7 +6,7 @@ namespace Mp3Player.Menu.Commands.PlayerCommands;
 public class StopCommand : ICommand<bool, string>
 {
     private readonly Player _player;
-    public string Description => "Стоп";
+    public string Description => "Назад";
 
     public StopCommand(Player player)
     {
