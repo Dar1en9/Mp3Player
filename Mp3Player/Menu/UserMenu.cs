@@ -113,8 +113,9 @@ public class UserMenu
     
     private async Task OnPlaybackFinished(object? sender, EventArgs e)
     {
-        await Console.Out.WriteLineAsync("Воспроизведение завершено. Возвращение к списку треков");
-        await _menuNavigator.NavigateTo(_trackListPage);
+        await _playerMenu.Close();
+        await _menuNavigator.NavigateTo(_trackListPage, 
+            "Воспроизведение завершено. Возвращение к списку треков");
     }
 
     private async Task TracksToButtons(ICommand<List<Track>, string> command, 
