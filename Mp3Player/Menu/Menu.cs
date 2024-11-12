@@ -9,20 +9,29 @@ public class Menu : IMenu
     private readonly ICommandReader _commandReader;
     public Dictionary<int, IButton>? Buttons { get; set; }
     private readonly string _label;
-    
+    private bool _exitMenu; 
+    private readonly CancellationTokenSource _cancellationTokenSource;
     public Menu(string label, ICommandReader commandReader)
     {
         _label = label;
         _commandReader = commandReader;
+        _cancellationTokenSource = new CancellationTokenSource();
     }
     
     public async Task<IMenu> Run()
     {
-        Console.WriteLine("##" + _label);
-        
+        _exitMenu = false;
+        await Console.Out.WriteLineAsync("##" + _label);
         await ShowHelp(); 
-        var button = await CommandHandler(); 
-        await ButtonClick(button); 
+        //логи показаны кнопки
+        while (!_exitMenu)
+        {
+            var button = await CommandHandler(_cancellationTokenSource.Token);
+            //логи выбрана кнопка {button.Label}
+            if (button != null) await ButtonClick(button);
+            //логи Выполнено действие кнопки
+        }
+
         return this;
     }
     
@@ -33,29 +42,39 @@ public class Menu : IMenu
         await Task.WhenAll(execute); //добавить помимо execute логи
     }
 
-    public async Task<IButton> CommandHandler()
+    public async Task<IButton?> CommandHandler(CancellationToken cancellationToken)
     {
         while (true)
         {
-            var key = await _commandReader.GetInput();
             try
             {
+                var key = await _commandReader.GetInput(cancellationToken);
+                //логи что ввод получен
                 if (Buttons == null)
                 {
                     Console.WriteLine("Кажется, в меню нечего делать :(");
+                    //логи
                     return new Button("", () =>
                     {
                         Environment.Exit(0);
                         return Task.CompletedTask;
                     });
                 }
-                if (Buttons.TryGetValue(key, out var button)) return button;
+
+                if (Buttons.TryGetValue(key, out var button))
+                    //логи
+                    return button;
                 throw new WrongCommandException();
             }
             catch (WrongCommandException ex)
             {
                 //сделать логи
-                await Console.Out.WriteLineAsync(ex.Message);
+                await Console.Out.WriteLineAsync($"{ex.Message} из menu {_label}");
+            }
+            catch (OperationCanceledException)
+            {
+                //логи
+                return null;
             }
         }
     }
@@ -69,5 +88,10 @@ public class Menu : IMenu
         }
         foreach (var button in Buttons)
             await Console.Out.WriteLineAsync($"{button.Key}: {button.Value.Label}");
+    }
+    public async Task Close() 
+    { 
+        _exitMenu = true; 
+        await _cancellationTokenSource.CancelAsync(); 
     }
 }
