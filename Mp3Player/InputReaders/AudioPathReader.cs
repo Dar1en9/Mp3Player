@@ -6,12 +6,12 @@ namespace Mp3Player.InputReaders;
 
 public partial class AudioPathReader : IAudioPathReader
 {
-    public async Task<string> GetInput()
+    public async Task<string> GetInput(CancellationToken cancellationToken = default)
     {
         while (true)
         {
             await Console.Out.WriteLineAsync("Введите полный путь аудиофайла:"); 
-            var path = await Console.In.ReadLineAsync();
+            var path = await Console.In.ReadLineAsync(cancellationToken);
             if (string.IsNullOrWhiteSpace(path)) throw new MissClickException();
             if (MyRegex().IsMatch(path) && File.Exists(path)) return path;
             try

@@ -5,12 +5,12 @@ namespace Mp3Player.InputReaders;
 
 public partial class ProfessorReader : IProfessorReader
 {
-    public async Task<string> GetInput()
+    public async Task<string> GetInput(CancellationToken cancellationToken = default)
     {
         while (true)
         {
             await Console.Out.WriteLineAsync("Введите имя преподавателя в формате Фамилия И. О.:");
-            var name = await Console.In.ReadLineAsync();
+            var name = await Console.In.ReadLineAsync(cancellationToken);
             var regex = MyRegex(); //регулярное выражение на основе паттерна
             if (string.IsNullOrWhiteSpace(name)) throw new MissClickException();
             if (regex.IsMatch(name)) return name;
