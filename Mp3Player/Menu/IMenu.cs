@@ -6,6 +6,6 @@ public interface IMenu
 {
     Task<IMenu> Run();
     Task ButtonClick(IButton button);
-    Task<IButton> CommandHandler();
+    Task<IButton?> CommandHandler(CancellationToken cancellationToken);
     Task ShowHelp();
 }
