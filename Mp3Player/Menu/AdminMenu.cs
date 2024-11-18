@@ -52,7 +52,7 @@ public class AdminMenu
         {
            if (await _addTrackCommand.Execute())
                await Console.Out.WriteLineAsync("Трек успешно добавлен");
-            await _mainMenu.Run();
+           await _mainMenu.Run();
         });
         var deleteTrackButton = new Button(_deleteTrackCommand.Description,async () =>
         {
