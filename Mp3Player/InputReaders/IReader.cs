@@ -2,5 +2,5 @@
 
 public interface IReader<T>
 {
-    Task<T> GetInput(CancellationToken cancellationToken = default, string? from  = default);
+    Task<T> GetInput(CancellationToken cancellationToken = default);
 }

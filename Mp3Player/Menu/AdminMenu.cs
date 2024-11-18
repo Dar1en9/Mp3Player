@@ -8,7 +8,7 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu;
 
-public class AdminMenus
+public class AdminMenu
 {
     private readonly GetAllTracksCommand _getAllTracksCommand;
     private readonly AddTrackCommand _addTrackCommand;
@@ -16,7 +16,7 @@ public class AdminMenus
     private readonly ExitCommand _exitCommand;
     private readonly Menu _mainMenu;
 
-    public AdminMenus(string storageDirectory)
+    public AdminMenu(string storageDirectory)
     {
         var dataBaseWriter = new DataBaseWriter(storageDirectory);
         var dataBaseReader = new DataBaseReader(storageDirectory);

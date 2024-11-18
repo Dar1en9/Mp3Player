@@ -5,7 +5,7 @@ namespace Mp3Player.InputReaders;
 
 public partial class ProfessorReader : IProfessorReader
 {
-    public async Task<string> GetInput(CancellationToken cancellationToken = default, string? from  = default)
+    public async Task<string> GetInput(CancellationToken cancellationToken = default)
     {
         while (true)
         {

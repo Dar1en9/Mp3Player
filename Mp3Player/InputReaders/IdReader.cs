@@ -4,7 +4,7 @@ namespace Mp3Player.InputReaders;
 
 public class IdReader: IReader<string>
 {
-    public async Task<string> GetInput(CancellationToken cancellationToken = default, string? from  = default)
+    public async Task<string> GetInput(CancellationToken cancellationToken = default)
     {
         await Console.Out.WriteLineAsync("Введите id трека для удаления:");
         var id = await Console.In.ReadLineAsync(cancellationToken);

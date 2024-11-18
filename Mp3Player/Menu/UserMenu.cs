@@ -11,7 +11,7 @@ using NetCoreAudio;
 
 namespace Mp3Player.Menu;
 
-public class UserMenus
+public class UserMenu
 {
     private readonly FindTracksCommand _findTrackCommand;
     private readonly GetAllTracksCommand _getAllTracksCommand;
@@ -27,7 +27,7 @@ public class UserMenus
     private readonly Button _resumeButton;
     private readonly Button _stopButton;
 
-    public UserMenus(string storageDirectory, string historyDirectory)
+    public UserMenu(string storageDirectory, string historyDirectory)
     {
         var dataBaseReader = new DataBaseReader(storageDirectory);
         var professorReader = new ProfessorReader();
@@ -42,10 +42,10 @@ public class UserMenus
         var pauseCommand = new PauseCommand(_player);
         var resumeCommand = new ResumeCommand(_player);
         var stopCommand = new StopCommand(_player);
+        _menuNavigator = new MenuNavigator();
         _trackListPage = new Menu("Список треков по вашему запросу", commandReader);
         _mainMenu = new Menu("Главное меню", commandReader);
         _playerMenu = new Menu("Плеер", commandReader);
-        _menuNavigator = new MenuNavigator();
         _resumeButton = new Button(resumeCommand.Description, async () =>
         {
             await resumeCommand.Execute();
@@ -59,25 +59,18 @@ public class UserMenus
         _stopButton = new Button(stopCommand.Description, async () =>
         {
             await stopCommand.Execute();
-            await _playerMenu.Close();
             await _menuNavigator.NavigateTo(_trackListPage);
         });
         Init();
     }
-
-    public async Task Run()
-    {
-        await _mainMenu.Run();
-    }
-
+    
+    public async Task Run() => await _mainMenu.Run();
+    
     private void Init()
     {
         _playCommand.OnPlaybackFinished = OnPlaybackFinished;
         var toMainMenuButton = new Button("В главное меню", async () => 
-            { 
-                await _trackListPage.Close();
-                await _menuNavigator.NavigateTo(_mainMenu);
-            });
+            await _menuNavigator.NavigateTo(_mainMenu));
         var findTracksButton = new Button(_findTrackCommand.Description,
             async () =>
             {
@@ -87,8 +80,8 @@ public class UserMenus
                 }
                 catch (MissClickException ex)
                 {
-                    await _mainMenu.Close();
-                    await _menuNavigator.NavigateTo(_mainMenu, ex.Message);
+                    await Console.Out.WriteLineAsync(ex.Message);
+                    await _menuNavigator.NavigateTo(_mainMenu);
                 }
             });
         var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () => 
@@ -109,23 +102,20 @@ public class UserMenus
 
     private async Task UpdatePlayerButtons()
     {
-        await Task.Delay(100);
         _playerMenu.Buttons = new Dictionary<int, IButton>
         {
             {1, _player is { Playing: true, Paused: false } or 
                 { Playing: false } ? _pauseButton : _resumeButton},
             {2, _stopButton}
         };
-        //AnsiConsole.Clear();
-        //await _menuNavigator.NavigateTo(_playerMenu);
+        await _menuNavigator.NavigateTo(_playerMenu);
     }
     
     private async Task OnPlaybackFinished(object? sender, EventArgs e)
     {
         await _playerMenu.Close();
-        await Console.Out.WriteLineAsync("OnPlaybackFinished вызвал Close()");
-   //     await _menuNavigator.NavigateTo(_trackListPage, 
-        //    "Воспроизведение завершено. Возвращение к списку треков из OnplybackFinished");
+        await _menuNavigator.NavigateTo(_trackListPage, 
+            "Воспроизведение завершено. Возвращение к списку треков");
     }
 
     private async Task TracksToButtons(ICommand<List<Track>, string> command, 
@@ -146,22 +136,18 @@ public class UserMenus
                 {
                     try
                     {
-//                        await _trackListPage.Close();
                         await _playCommand.Execute(track);
                         await UpdatePlayerButtons();
-                        await _menuNavigator.NavigateTo(_playerMenu);
                     }
                     catch (NoDataFoundException ex)
                     {
-                        await _playerMenu.Close();
-                      //  await _menuNavigator.NavigateTo(_trackListPage, ex.Message);
+                        await _menuNavigator.NavigateTo(_trackListPage, ex.Message);
                     }
                 }))
             .Select((button, index) => new { button, index })
             .ToDictionary(x => x.index + 1, IButton (x) => x.button);
         buttons.Add(0, navigationButton);
         _trackListPage.Buttons = buttons;
-        await _mainMenu.Close();
         await _menuNavigator.NavigateTo(_trackListPage);
     }
 }

@@ -6,7 +6,7 @@ namespace Mp3Player.InputReaders;
 
 public partial class AudioPathReader : IAudioPathReader
 {
-    public async Task<string> GetInput(CancellationToken cancellationToken = default, string? from  = default)
+    public async Task<string> GetInput(CancellationToken cancellationToken = default)
     {
         while (true)
         {

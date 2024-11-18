@@ -9,8 +9,11 @@
 
     <ItemGroup>
       <PackageReference Include="NetCoreAudio" Version="2.0.0" />
-      <PackageReference Include="Spectre.Console" Version="0.49.1" />
       <PackageReference Include="System.Windows.Extensions" Version="9.0.0-rc.1.24431.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="MenuCommands\AdminMenu\" />
     </ItemGroup>
 
 </Project>
