@@ -2,6 +2,6 @@
 
 public interface IUniCommand
 {
-    string? Description { get; }
+    string Description { get; }
     Task Execute();
 }
