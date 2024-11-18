@@ -5,7 +5,7 @@ namespace Mp3Player.Menu.Commands;
 public class ShowMenuCommand: ICommand<bool, string>
 {
     private readonly Dictionary<int, IButton> _buttons;
-    public string? Description { get; } = "Доступные команды";
+    public string Description => "Доступные команды";
 
     public ShowMenuCommand(Dictionary<int, IButton> buttons) 
     {
