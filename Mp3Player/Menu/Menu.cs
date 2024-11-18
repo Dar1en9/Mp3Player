@@ -37,9 +37,8 @@ public class Menu : IMenu
     
     public async Task ButtonClick(IButton button)
     {
-        var execute = button.OnClick();
+        await button.OnClick();
         //залогировать
-        await Task.WhenAll(execute); //добавить помимо execute логи
     }
 
     public async Task<IButton?> CommandHandler(CancellationToken cancellationToken)
