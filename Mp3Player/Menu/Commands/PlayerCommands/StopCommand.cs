@@ -23,7 +23,6 @@ public class StopCommand : ICommand<bool, string>
         try
         {
             await _player.Stop();
-            Console.WriteLine("Воспроизведение завершено. Возвращение к списку треков");
         }
         catch (Exception ex)
         {
