@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using Mp3Player.InputReaders;
-using Mp3Player.Menu;
+﻿using Mp3Player.Menu;
 
-namespace Mp3Player;
+namespace Mp3Player.Runners;
 
 public class ProgramRunner(string[] args): IProgramRunner
 {
