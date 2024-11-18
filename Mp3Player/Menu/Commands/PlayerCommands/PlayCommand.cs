@@ -35,6 +35,7 @@ public class PlayCommand : ICommand<bool, Track>
 
     private async void OnPlaybackFinishedWrapper(object? sender, EventArgs e)
     {
+        await Console.Out.WriteLineAsync("OnPlaybackFinished сработал");
         if (OnPlaybackFinished != null) await OnPlaybackFinished(sender, e); 
     }
 }

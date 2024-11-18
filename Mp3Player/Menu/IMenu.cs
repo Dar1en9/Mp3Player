@@ -8,4 +8,5 @@ public interface IMenu
     Task ButtonClick(IButton button);
     Task<IButton?> CommandHandler(CancellationToken cancellationToken);
     Task ShowHelp();
+    Task Close();
 }

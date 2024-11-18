@@ -14,6 +14,7 @@ public class Button : IButton
 
     public async Task OnClick()
     {
+        //логи OnClick кнопки сработал
         await _act();
     }
 }

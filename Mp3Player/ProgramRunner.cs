@@ -14,7 +14,15 @@ public class ProgramRunner(string[] args): IProgramRunner
         if (!Directory.Exists(_path)) Directory.CreateDirectory(_path);
         var storagePath = Path.Combine(_path, "Storage");
         if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
-        if (args.Contains("admin")) await new AdminMenu(storagePath).Run();
-        else await new UserMenu(storagePath, _path).Run();
+        if (args.Contains("admin"))
+        {
+            var menu = new AdminMenus(storagePath);
+            await menu.Run();
+        }
+        else
+        {
+            var menu = new UserMenus(storagePath, _path);
+            await menu.Run();
+        }
     }
 }

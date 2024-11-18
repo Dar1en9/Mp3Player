@@ -1,4 +1,5 @@
-﻿using Mp3Player.Exceptions;
+﻿using System.Reflection.Emit;
+using Mp3Player.Exceptions;
 using Mp3Player.InputReaders;
 using Mp3Player.Menu.Buttons;
 
@@ -10,7 +11,7 @@ public class Menu : IMenu
     public Dictionary<int, IButton>? Buttons { get; set; }
     private readonly string _label;
     private bool _exitMenu; 
-    private readonly CancellationTokenSource _cancellationTokenSource;
+    private CancellationTokenSource _cancellationTokenSource;
     public Menu(string label, ICommandReader commandReader)
     {
         _label = label;
@@ -20,35 +21,47 @@ public class Menu : IMenu
     
     public async Task<IMenu> Run()
     {
+        _cancellationTokenSource = new CancellationTokenSource();
         _exitMenu = false;
-        await Console.Out.WriteLineAsync("##" + _label);
-        await ShowHelp(); 
-        //логи показаны кнопки
         while (!_exitMenu)
         {
+            await Console.Out.WriteLineAsync("##" + _label);
+            await ShowHelp(); 
+            //логи показаны кнопки
+            Console.WriteLine($"{_label} while");
             var button = await CommandHandler(_cancellationTokenSource.Token);
+            Console.WriteLine($"CommandHandler ended in {_label}");
             //логи выбрана кнопка {button.Label}
             if (button != null) await ButtonClick(button);
+            else await Console.Out.WriteLineAsync($"button == {button}, _exitMenu is {_exitMenu}");
             //логи Выполнено действие кнопки
         }
-
         return this;
     }
     
     public async Task ButtonClick(IButton button)
     {
-        var execute = button.OnClick();
+        Console.WriteLine($"ButtonClick on button {button.Label} started in {_label}");
+        await button.OnClick();
         //залогировать
-        await Task.WhenAll(execute); //добавить помимо execute логи
+        //Task.WhenAll(execute); //добавить помимо execute логи
+        Console.WriteLine($"ButtonClick ended in {_label}");
     }
 
     public async Task<IButton?> CommandHandler(CancellationToken cancellationToken)
     {
+        Console.WriteLine($"CommandHandler started in {_label}");
         while (true)
         {
             try
             {
-                var key = await _commandReader.GetInput(cancellationToken);
+                // if (cancellationToken.IsCancellationRequested)
+                // {
+                //     await Console.Out.WriteLineAsync($"cancellation requested in {_label}");
+                //     return null;
+                // }
+                var key = await _commandReader.GetInput(cancellationToken, _label);
+                Console.WriteLine($"Ввод получен в {_label}");
                 //логи что ввод получен
                 if (Buttons == null)
                 {
@@ -69,11 +82,12 @@ public class Menu : IMenu
             catch (WrongCommandException ex)
             {
                 //сделать логи
-                await Console.Out.WriteLineAsync($"{ex.Message} из menu {_label}");
+                await Console.Out.WriteLineAsync($"{ex.Message} из menu {_label}, кнопки в котором:");
             }
             catch (OperationCanceledException)
             {
                 //логи
+                await Console.Out.WriteLineAsync($"OperationCanceledException был словлен в {_label}");
                 return null;
             }
         }
@@ -92,6 +106,7 @@ public class Menu : IMenu
     public async Task Close() 
     { 
         _exitMenu = true; 
-        await _cancellationTokenSource.CancelAsync(); 
+        await _cancellationTokenSource.CancelAsync();
+        await Task.CompletedTask;
     }
 }
