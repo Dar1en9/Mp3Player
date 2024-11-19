@@ -1,8 +1,9 @@
-﻿using Mp3Player.Exceptions;
+﻿using Microsoft.Extensions.Logging;
+using Mp3Player.Exceptions;
 
 namespace Mp3Player.InputReaders;
 
-public class CommandReader : ICommandReader
+public class CommandReader(ILogger logger) : ICommandReader
 {
     public async Task<int> GetInput(CancellationToken cancellationToken = default)
     {
@@ -10,12 +11,20 @@ public class CommandReader : ICommandReader
         {
             try
             {
+                logger.LogInformation("Запрос ввода команды");
                 var command = await Console.In.ReadLineAsync(cancellationToken);
-                if (int.TryParse(command, out var key) && key >= 0) return key;
-                throw new WrongCommandException();
+                logger.LogInformation("Пользователь ввел команду команду: {Command}", command);
+                if (!int.TryParse(command, out var key) || key < 0)
+                {
+                    logger.LogWarning("Введенная команда: {Command} Не является натуральным числом", command);
+                    throw new WrongCommandException();
+                }
+                logger.LogInformation("Команда успешно преобразована в число: {Key}", key);
+                return key;
             }
             catch (WrongCommandException ex)
             {
+                logger.LogWarning("Ошибка: {Message}", ex.Message);
                 await Console.Out.WriteLineAsync(ex.Message);
             }
         }
