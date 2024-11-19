@@ -1,4 +1,5 @@
-﻿using Mp3Player.DataBase;
+﻿using Microsoft.Extensions.Logging;
+using Mp3Player.DataBase;
 using Mp3Player.Exceptions;
 using Mp3Player.History;
 using Mp3Player.InputReaders;
@@ -9,9 +10,9 @@ using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.TrackHandler;
 using NetCoreAudio;
 
-namespace Mp3Player.Menu;
+namespace Mp3Player.Menu.Pages;
 
-public class UserMenu
+public class UserPages: IPages
 {
     private readonly FindTracksCommand _findTrackCommand;
     private readonly GetAllTracksCommand _getAllTracksCommand;
@@ -26,26 +27,28 @@ public class UserMenu
     private readonly Button _pauseButton;
     private readonly Button _resumeButton;
     private readonly Button _stopButton;
+    private readonly ILogger _logger;
 
-    public UserMenu(string storageDirectory, string historyDirectory)
+    public UserPages(string storageDirectory, string historyDirectory, ILogger logger)
     {
-        var dataBaseReader = new DataBaseReader(storageDirectory);
-        var professorReader = new ProfessorReader();
-        var commandReader = new CommandReader();
-        var historyManager = new HistoryManager(historyDirectory);
+        _logger = logger;
+        var dataBaseReader = new DataBaseReader(storageDirectory, logger);
+        var professorReader = new ProfessorReader(logger);
+        var commandReader = new CommandReader(logger);
+        var historyManager = new HistoryManager(historyDirectory, logger);
         _player = new Player();
-        _findTrackCommand = new FindTracksCommand(professorReader, dataBaseReader, historyManager);
-        _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader);
-        _getHistoryCommand = new GetHistoryCommand(dataBaseReader, historyManager);
-        _exitCommand = new ExitCommand();
-        _playCommand = new PlayCommand(_player);
-        var pauseCommand = new PauseCommand(_player);
-        var resumeCommand = new ResumeCommand(_player);
-        var stopCommand = new StopCommand(_player);
-        _menuNavigator = new MenuNavigator();
-        _trackListPage = new Menu("Список треков по вашему запросу", commandReader);
-        _mainMenu = new Menu("Главное меню", commandReader);
-        _playerMenu = new Menu("Плеер", commandReader);
+        _findTrackCommand = new FindTracksCommand(professorReader, dataBaseReader, historyManager, logger);
+        _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader, logger);
+        _getHistoryCommand = new GetHistoryCommand(dataBaseReader, historyManager, logger);
+        _exitCommand = new ExitCommand(logger);
+        _playCommand = new PlayCommand(_player, _logger);
+        var pauseCommand = new PauseCommand(_player, _logger);
+        var resumeCommand = new ResumeCommand(_player, _logger);
+        var stopCommand = new StopCommand(_player, _logger);
+        _menuNavigator = new MenuNavigator(logger);
+        _trackListPage = new Menu("Список треков по вашему запросу", commandReader, logger);
+        _mainMenu = new Menu("Главное меню", commandReader, logger);
+        _playerMenu = new Menu("Плеер", commandReader, logger);
         _resumeButton = new Button(resumeCommand.Description, async () =>
         {
             await resumeCommand.Execute();
@@ -63,33 +66,53 @@ public class UserMenu
         });
         Init();
     }
-    
-    public async Task Run() => await _mainMenu.Run();
-    
-    private void Init()
+
+    public async Task Run()
     {
+        _logger.LogInformation("Запуск главного меню User Pages");
+        await _mainMenu.Run();
+        _logger.LogInformation("Завершение UserPages");
+    }
+
+    public void Init()
+    {
+        _logger.LogInformation("Инициализация UserPages");
         _playCommand.OnPlaybackFinished = OnPlaybackFinished;
-        var toMainMenuButton = new Button("В главное меню", async () => 
-            await _menuNavigator.NavigateTo(_mainMenu));
+        var toMainMenuButton = new Button("В главное меню", async () =>
+        {
+            _logger.LogInformation("Возвращение в главное меню");
+            await _menuNavigator.NavigateTo(_mainMenu);
+        });
         var findTracksButton = new Button(_findTrackCommand.Description,
             async () =>
             {
+                _logger.LogInformation("Выполнение кнопки: {Description}", _findTrackCommand.Description);
                 try
                 {
                     await TracksToButtons(_findTrackCommand, toMainMenuButton);
                 }
                 catch (MissClickException ex)
                 {
+                    _logger.LogInformation("Ошибка: {Message}", ex.Message);
                     await Console.Out.WriteLineAsync(ex.Message);
                     await _menuNavigator.NavigateTo(_mainMenu);
                 }
             });
-        var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () => 
-            await TracksToButtons(_getAllTracksCommand, toMainMenuButton));
+        var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () =>
+        {
+            _logger.LogInformation("Выполнение кнопки: {Description}", _getAllTracksCommand.Description);
+            await TracksToButtons(_getAllTracksCommand, toMainMenuButton);
+        });
         var getHistoryButton = new Button(_getHistoryCommand.Description, async () =>
-            await TracksToButtons(_getHistoryCommand, toMainMenuButton));
+        {
+            _logger.LogInformation("Выполнение кнопки: {Description}", _getHistoryCommand.Description);
+            await TracksToButtons(_getHistoryCommand, toMainMenuButton);
+        });
         var exitButton = new Button(_exitCommand.Description, async () =>
-            await _exitCommand.Execute());
+        {
+            _logger.LogInformation("Выполнение кнопки: {Description}", _exitCommand.Description);
+            await _exitCommand.Execute();
+        });
         var mainMenuButtons = new Dictionary<int, IButton>
         {
             {1, findTracksButton},
@@ -98,10 +121,12 @@ public class UserMenu
             {4, exitButton}
         };
         _mainMenu.Buttons = mainMenuButtons;
+        _logger.LogInformation("UserPages инициализирован");
     }
 
     private async Task UpdatePlayerButtons()
     {
+        _logger.LogInformation("Обновление кнопок плеера");
         _playerMenu.Buttons = new Dictionary<int, IButton>
         {
             {1, _player is { Playing: true, Paused: false } or 
@@ -113,6 +138,7 @@ public class UserMenu
     
     private async Task OnPlaybackFinished(object? sender, EventArgs e)
     {
+        _logger.LogInformation("Воспроизведение завершено автоматически");
         await _playerMenu.Close();
         await _menuNavigator.NavigateTo(_trackListPage, 
             "Воспроизведение завершено. Возвращение к списку треков");
@@ -124,11 +150,12 @@ public class UserMenu
         List<Track> tracks;
         try
         {
+            _logger.LogInformation("Попытка получить треки по кнопке: {Description}", command.Description);
             tracks = await command.Execute();
         }
-        catch (FileNotFoundException)
+        catch (FileNotFoundException ex)
         {
-            //логи сделать
+            _logger.LogWarning("Ошибка: {Message}", ex.Message);
             tracks = [];
         }
         var buttons = tracks.Select(track => 
@@ -136,11 +163,13 @@ public class UserMenu
                 {
                     try
                     {
+                        _logger.LogInformation("Попытка воспроизвести трек: {TrackName}", track.TrackName);
                         await _playCommand.Execute(track);
                         await UpdatePlayerButtons();
                     }
                     catch (NoDataFoundException ex)
                     {
+                        _logger.LogWarning("Ошибка: {Message}", ex.Message);
                         await _menuNavigator.NavigateTo(_trackListPage, ex.Message);
                     }
                 }))
@@ -148,6 +177,7 @@ public class UserMenu
             .ToDictionary(x => x.index + 1, IButton (x) => x.button);
         buttons.Add(0, navigationButton);
         _trackListPage.Buttons = buttons;
+        _logger.LogInformation("Обновлены кнопки в списке треков");
         await _menuNavigator.NavigateTo(_trackListPage);
     }
 }
