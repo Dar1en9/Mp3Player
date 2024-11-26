@@ -21,14 +21,7 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             logging.AddConsole();
             var logLevel = context.Configuration.GetValue<string>("LOG_LEVEL");
 
-            if (Enum.TryParse<LogLevel>(logLevel, out var level))
-            {
-                logging.SetMinimumLevel(level);
-            }
-            else
-            {
-                logging.SetMinimumLevel(LogLevel.None); //уровень по умолчанию
-            }
+            logging.SetMinimumLevel(Enum.TryParse<LogLevel>(logLevel, out var level) ? level : LogLevel.None); //уровень по умолчанию
         })
         .ConfigureServices((hostContext, services) =>
         {
@@ -36,13 +29,6 @@ static IHostBuilder CreateHostBuilder(string[] args) =>
             services.AddLogging(configure => configure.AddConsole())
                 .Configure<LoggerFilterOptions>(options =>
                 {
-                    if (Enum.TryParse<LogLevel>(logLevel, out var level))
-                    {
-                        options.MinLevel = level;
-                    }
-                    else
-                    {
-                        options.MinLevel = LogLevel.None; //уровень по умолчанию
-                    }
+                    options.MinLevel = Enum.TryParse<LogLevel>(logLevel, out var level) ? level : LogLevel.None; //уровень по умолчанию
                 });
         });
