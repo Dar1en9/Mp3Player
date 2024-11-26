@@ -69,48 +69,48 @@ public class UserPages: IPages
 
     public async Task Run()
     {
-        _logger.LogInformation("Запуск главного меню User Pages");
+        _logger.LogDebug("Запуск главного меню User Pages");
         await _mainMenu.Run();
-        _logger.LogInformation("Завершение UserPages");
+        _logger.LogDebug("Завершение UserPages");
     }
 
     public void Init()
     {
-        _logger.LogInformation("Инициализация UserPages");
+        _logger.LogDebug("Инициализация UserPages");
         _playCommand.OnPlaybackFinished = OnPlaybackFinished;
         var toMainMenuButton = new Button("В главное меню", async () =>
         {
-            _logger.LogInformation("Возвращение в главное меню");
+            _logger.LogDebug("Возвращение в главное меню");
             await _menuNavigator.NavigateTo(_mainMenu);
         });
         var findTracksButton = new Button(_findTrackCommand.Description,
             async () =>
             {
-                _logger.LogInformation("Выполнение кнопки: {Description}", _findTrackCommand.Description);
+                _logger.LogDebug("Выполнение кнопки: {Description}", _findTrackCommand.Description);
                 try
                 {
                     await TracksToButtons(_findTrackCommand, toMainMenuButton);
                 }
                 catch (MissClickException ex)
                 {
-                    _logger.LogInformation("Ошибка: {Message}", ex.Message);
+                    _logger.LogDebug("Ошибка: {Message}", ex.Message);
                     await Console.Out.WriteLineAsync(ex.Message);
                     await _menuNavigator.NavigateTo(_mainMenu);
                 }
             });
         var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _getAllTracksCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _getAllTracksCommand.Description);
             await TracksToButtons(_getAllTracksCommand, toMainMenuButton);
         });
         var getHistoryButton = new Button(_getHistoryCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _getHistoryCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _getHistoryCommand.Description);
             await TracksToButtons(_getHistoryCommand, toMainMenuButton);
         });
         var exitButton = new Button(_exitCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _exitCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _exitCommand.Description);
             await _exitCommand.Execute();
         });
         var mainMenuButtons = new Dictionary<int, IButton>
@@ -121,7 +121,7 @@ public class UserPages: IPages
             {4, exitButton}
         };
         _mainMenu.Buttons = mainMenuButtons;
-        _logger.LogInformation("UserPages инициализирован");
+        _logger.LogDebug("UserPages инициализирован");
     }
 
     private async Task UpdatePlayerButtons()
@@ -139,9 +139,8 @@ public class UserPages: IPages
     private async Task OnPlaybackFinished(object? sender, EventArgs e)
     {
         _logger.LogInformation("Воспроизведение завершено автоматически");
-        await _playerMenu.Close();
-        await _menuNavigator.NavigateTo(_trackListPage, 
-            "Воспроизведение завершено. Возвращение к списку треков");
+        await Console.Out.WriteLineAsync("Воспроизведение завершено. Нажмите 'Назад' " +
+                                         "для возвращения к списку треков");
     }
 
     private async Task TracksToButtons(ICommand<List<Track>, string> command, 

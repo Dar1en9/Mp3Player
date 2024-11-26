@@ -27,12 +27,12 @@ public class PlayCommand : ICommand<bool, Track>
     
     public async Task<bool> Execute(Track? track = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         if (OnPlaybackFinished != null)
         {
             _player.PlaybackFinished -= OnPlaybackFinishedWrapper; // Отписка от события
             _player.PlaybackFinished += OnPlaybackFinishedWrapper; // Подписка на событие
-            _logger.LogInformation("Подписка на событие по завершению трека");
+            _logger.LogDebug("Подписка на событие по завершению трека");
         }
 
         if (track == null || string.IsNullOrWhiteSpace(track.AudioPath) || !File.Exists(track.AudioPath))
@@ -40,16 +40,16 @@ public class PlayCommand : ICommand<bool, Track>
             _logger.LogWarning("Трек не найден или путь к аудиофайлу пустой");
             throw new NoDataFoundException();
         }
-        _logger.LogInformation("Начало воспроизведения трека: {track}", track);
+        _logger.LogDebug("Начало воспроизведения трека: {track}", track);
         await _player.Play(track.AudioPath);
-        _logger.LogInformation("Завершено воспроизведение трека: {track}", track);
+        _logger.LogDebug("Завершено воспроизведение трека: {track}", track);
         return true;
     }
 
     private async void OnPlaybackFinishedWrapper(object? sender, EventArgs e)
     {
         if (OnPlaybackFinished == null) return;
-        _logger.LogInformation("Воспроизведение завершено, вызов обработчика события");
+        _logger.LogDebug("Воспроизведение завершено, вызов обработчика события");
         await OnPlaybackFinished(sender, e);
     }
 }

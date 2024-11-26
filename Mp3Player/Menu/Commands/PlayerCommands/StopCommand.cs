@@ -25,11 +25,11 @@ public class StopCommand : ICommand<bool, string>
     
     public async Task<bool> Execute(string? arg = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         try
         {
             await _player.Stop();
-            _logger.LogInformation("Воспроизведение трека остановлено");
+            _logger.LogDebug("Воспроизведение трека остановлено");
         }
         catch (Exception ex)
         {

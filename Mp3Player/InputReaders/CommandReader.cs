@@ -11,15 +11,15 @@ public class CommandReader(ILogger logger) : ICommandReader
         {
             try
             {
-                logger.LogInformation("Запрос ввода команды");
+                logger.LogDebug("Запрос ввода команды");
                 var command = await Console.In.ReadLineAsync(cancellationToken);
-                logger.LogInformation("Пользователь ввел команду команду: {Command}", command);
+                logger.LogDebug("Пользователь ввел команду команду: {Command}", command);
                 if (!int.TryParse(command, out var key) || key < 0)
                 {
                     logger.LogWarning("Введенная команда: {Command} Не является натуральным числом", command);
                     throw new WrongCommandException();
                 }
-                logger.LogInformation("Команда успешно преобразована в число: {Key}", key);
+                logger.LogDebug("Команда успешно преобразована в число: {Key}", key);
                 return key;
             }
             catch (WrongCommandException ex)

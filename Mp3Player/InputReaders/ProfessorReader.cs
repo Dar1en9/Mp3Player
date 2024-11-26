@@ -10,20 +10,20 @@ public partial class ProfessorReader(ILogger logger) : IProfessorReader
     {
         while (true)
         {
-            logger.LogInformation("Запрос ввода имени преподавателя");
+            logger.LogDebug("Запрос ввода имени преподавателя");
             await Console.Out.WriteLineAsync("Введите имя преподавателя в формате Фамилия И. О.:");
             var name = await Console.In.ReadLineAsync(cancellationToken);
-            logger.LogInformation("Пользователь ввел имя преподавателя: {ProfessorName}", name);
+            logger.LogDebug("Пользователь ввел имя преподавателя: {ProfessorName}", name);
             var regex = MyRegex(); //регулярное выражение на основе паттерна
             if (string.IsNullOrWhiteSpace(name))
             {
-                logger.LogInformation("Имя преподавателя пустое или содержит только пробелы");
+                logger.LogDebug("Имя преподавателя пустое или содержит только пробелы");
                 throw new MissClickException();
             }
 
             if (regex.IsMatch(name))
             {
-                logger.LogInformation("Имя преподавателя соответствует формату");
+                logger.LogDebug("Имя преподавателя соответствует формату");
                 return name;
             }
             try

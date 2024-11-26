@@ -28,17 +28,17 @@ public class AddTrackCommand: ICommand<bool, string>
     
     public async Task<bool> Execute(string? arg = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         try
         {
             var track = await _trackCreator.NewTrack();
-            _logger.LogInformation("Получен новый трек: {Track}", track);
+            _logger.LogDebug("Получен новый трек: {Track}", track);
             await _dataBaseWriter.WriteTrack(track);
-            _logger.LogInformation("Трек успешно добавлен в базу данных");
+            _logger.LogDebug("Трек успешно добавлен в базу данных");
         }
         catch (MissClickException ex)
         {
-            _logger.LogInformation("Ошибка: {Message}", ex.Message);
+            _logger.LogDebug("Ошибка: {Message}", ex.Message);
             await Console.Out.WriteLineAsync(ex.Message);
             return false;
         }

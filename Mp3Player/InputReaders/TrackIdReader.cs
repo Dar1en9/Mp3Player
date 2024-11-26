@@ -7,12 +7,12 @@ public class TrackIdReader(ILogger logger): IReader<string>
 {
     public async Task<string> GetInput(CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Запрос ввода идентификатора трека");
+        logger.LogDebug("Запрос ввода идентификатора трека");
         await Console.Out.WriteLineAsync("Введите id трека для удаления:");
         var id = await Console.In.ReadLineAsync(cancellationToken);
-        logger.LogInformation("Администратор ввел идентификатор трека: {TrackId}", id);
+        logger.LogDebug("Администратор ввел идентификатор трека: {TrackId}", id);
         if (!string.IsNullOrWhiteSpace(id)) return id;
-        logger.LogInformation("Идентификатор трека пустой или содержит только пробелы");
+        logger.LogDebug("Идентификатор трека пустой или содержит только пробелы");
         throw new MissClickException();
     }
 }

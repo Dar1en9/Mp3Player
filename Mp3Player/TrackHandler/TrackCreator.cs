@@ -21,7 +21,7 @@ public class TrackCreator: ITrackCreator
 
     public async Task<Track> NewTrack()
     {
-        _logger.LogInformation("Начало создания нового трека");
+        _logger.LogDebug("Начало создания нового трека");
         var professor = await _professorReader.GetInput();
         _logger.LogInformation("Получено имя преподавателя: {Professor}", professor);
         var trackName = await _trackNameReader.GetInput();

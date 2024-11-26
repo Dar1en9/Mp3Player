@@ -28,12 +28,12 @@ public class GetHistoryCommand: ICommand<List<Track>, string>
     
     public async Task<List<Track>> Execute(string? arg = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         var history = await _historyManager.GetHistory();
-        _logger.LogInformation("Получена история поиска");
+        _logger.LogDebug("Получена история поиска");
         var tracks = await _dataBaseReader.GetProfessorTracks(history);
-        _logger.LogInformation("Получены треки из базы данных. Команда {Description} завершила " +
-                               "выполнение", Description);
+        _logger.LogDebug("Получены треки из базы данных. Команда {Description} завершила " +
+                         "выполнение", Description);
         return tracks;
     }
 }

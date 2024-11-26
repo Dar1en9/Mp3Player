@@ -11,19 +11,19 @@ public partial class AudioPathReader(ILogger logger) : IAudioPathReader
     {
         while (true)
         {
-            logger.LogInformation("Запрос ввода полного пути аудиофайла");
+            logger.LogDebug("Запрос ввода полного пути аудиофайла");
             await Console.Out.WriteLineAsync("Введите полный путь аудиофайла:"); 
             var path = await Console.In.ReadLineAsync(cancellationToken);
-            logger.LogInformation("Пользователь ввел путь аудиофайла: {AudioPath}", path);
+            logger.LogDebug("Пользователь ввел путь аудиофайла: {AudioPath}", path);
             if (string.IsNullOrWhiteSpace(path))
             {
-                logger.LogInformation("Путь аудиофайла пустой или содержит только пробелы");
+                logger.LogDebug("Путь аудиофайла пустой или содержит только пробелы");
                 throw new MissClickException();
             }
 
             if (MyRegex().IsMatch(path) && File.Exists(path))
             {
-                logger.LogInformation("Путь аудиофайла соответствует формату и файл существует");
+                logger.LogDebug("Путь аудиофайла соответствует формату и файл существует");
                 return path;
             }
             try

@@ -18,19 +18,19 @@ public class DataBaseReader: IDataBaseReader {
     }
 
     public async Task<List<Track>> ReadAllTracks() {
-        _logger.LogInformation("Чтение всех треков из базы данных");
+        _logger.LogDebug("Чтение всех треков из базы данных");
         var professorsFolders = Directory.GetDirectories(_path);
         var tracks = new List<Track>();
         foreach (var professorFolder in professorsFolders)
         {
             tracks.AddRange(await GetProfessorTracks(professorFolder));
         }
-        _logger.LogInformation("Все треки ({amount}) успешно прочитаны", tracks.Count);
+        _logger.LogDebug("Все треки ({amount}) успешно прочитаны", tracks.Count);
         return tracks;
     }
 
     public async Task<List<Track>> GetProfessorTracks(string professorFolder) {
-        _logger.LogInformation("Чтение треков для преподавателя: {ProfessorFolder}", professorFolder);
+        _logger.LogDebug("Чтение треков для преподавателя: {ProfessorFolder}", professorFolder);
         var tracks = new List<Track>();
         var directory = Path.Combine(_path, professorFolder);
         if (!Directory.Exists(directory))
@@ -41,16 +41,16 @@ public class DataBaseReader: IDataBaseReader {
         var tracksPaths = Directory.GetFiles(directory);
         foreach (var trackPath in tracksPaths)
             tracks.Add(await GetTrack(trackPath));
-        _logger.LogInformation("Треки для преподавателя {ProfessorFolder} ({amount}) успешно прочитаны", 
+        _logger.LogDebug("Треки для преподавателя {ProfessorFolder} ({amount}) успешно прочитаны", 
             professorFolder, tracks.Count);
         return tracks;
     }
     
     public async Task<Track> GetTrack(string trackPath) {
-        _logger.LogInformation("Чтение трека из файла: {TrackPath}", trackPath);
+        _logger.LogDebug("Чтение трека из файла: {TrackPath}", trackPath);
         await using var openStream = File.OpenRead(trackPath);
         var track = await JsonSerializer.DeserializeAsync<Track>(openStream, _options) ?? throw new InvalidOperationException();
-        _logger.LogInformation("Трек успешно прочитан: {Track}", track);
+        _logger.LogDebug("Трек успешно прочитан: {Track}", track);
         return track;
     }
 }

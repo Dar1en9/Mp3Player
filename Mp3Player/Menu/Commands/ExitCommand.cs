@@ -15,7 +15,7 @@ public class ExitCommand(ILogger logger): ICommand<bool, string>
     
     public Task<bool> Execute(string? arg = default)
     {
-        logger.LogInformation("Выполнение команды: {Description}", Description);
+        logger.LogDebug("Выполнение команды: {Description}", Description);
         Environment.Exit(0);
         return Task.FromResult(false);
     }

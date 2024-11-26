@@ -24,11 +24,11 @@ public class ResumeCommand : ICommand<bool, string>
     
     public async Task<bool> Execute(string? arg = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         try
         {
             await _player.Resume();
-            _logger.LogInformation("Воспроизведение трека возобновлено");
+            _logger.LogDebug("Воспроизведение трека возобновлено");
         }
         catch (Exception ex)
         {

@@ -25,10 +25,10 @@ public class GetAllTracksCommand: ICommand<List<Track>, string>
     
     public async Task<List<Track>> Execute(string? arg = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         var tracks = await _dataBaseReader.ReadAllTracks();
-        _logger.LogInformation("Получены все треки ({amount}) из базы данных. Команда {Description} завершила " +
-                               "выполнение", tracks.Count, Description);
+        _logger.LogDebug("Получены все треки ({amount}) из базы данных. Команда {Description} завершила " +
+                         "выполнение", tracks.Count, Description);
         return tracks;
     }
 }

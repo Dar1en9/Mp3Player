@@ -23,11 +23,11 @@ public class Menu : IMenu
     
     public async Task<IMenu> Run()
     {
-        _logger.LogInformation("Запуск меню: {Label}", Label);
+        _logger.LogDebug("Запуск меню: {Label}", Label);
         _exitMenu = false;
         await Console.Out.WriteLineAsync("##" + Label);
         await ShowHelp(); 
-        _logger.LogInformation("Показаны все кнопки меню");
+        _logger.LogDebug("Показаны все кнопки меню");
         while (!_exitMenu)
         {
             var button = await CommandHandler(_cancellationTokenSource.Token);
@@ -35,18 +35,18 @@ public class Menu : IMenu
             {
                 _logger.LogInformation("Выбрана кнопка: {ButtonLabel}", button.Label);
                 await ButtonClick(button);
-                _logger.LogInformation("Завершено действие кнопки: {ButtonLabel}", button.Label);
+                _logger.LogDebug("Завершено действие кнопки: {ButtonLabel}", button.Label);
             }
         }
-        _logger.LogInformation("Меню {Label} завершено", Label);
+        _logger.LogDebug("Меню {Label} завершено", Label);
         return this;
     }
     
     public async Task ButtonClick(IButton button)
     {
-        _logger.LogInformation("Обработка нажатия кнопки: {ButtonLabel}", button.Label);
+        _logger.LogDebug("Обработка нажатия кнопки: {ButtonLabel}", button.Label);
         await button.OnClick();
-        _logger.LogInformation("Обработка кнопки {ButtonLabel} выполнена", button.Label);
+        _logger.LogDebug("Обработка кнопки {ButtonLabel} выполнена", button.Label);
     }
 
     public async Task<IButton?> CommandHandler(CancellationToken cancellationToken)
@@ -55,7 +55,7 @@ public class Menu : IMenu
         {
             try
             {
-                _logger.LogInformation("Ожидание ввода кнопки в меню: {Label}", Label);
+                _logger.LogDebug("Ожидание ввода кнопки в меню: {Label}", Label);
                 var key = await _commandReader.GetInput(cancellationToken);
                 _logger.LogInformation("Ввод получен: {Key}", key);
                 if (Buttons == null)
@@ -72,7 +72,7 @@ public class Menu : IMenu
 
                 if (Buttons.TryGetValue(key, out var button))
                 {
-                    _logger.LogInformation("Кнопка найдена: {ButtonLabel}", button.Label);
+                    _logger.LogDebug("Кнопка найдена: {ButtonLabel}", button.Label);
                     return button;
                 }
                 throw new WrongCommandException();
@@ -84,14 +84,14 @@ public class Menu : IMenu
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation("Ожидание ввода с консоли отменено");
+                _logger.LogDebug("Ожидание ввода с консоли отменено");
                 return null;
             }
         }
     }
     public async Task ShowHelp()
     {
-        _logger.LogInformation("Показ справки для меню: {Label}", Label);
+        _logger.LogDebug("Показ справки для меню: {Label}", Label);
         await Console.Out.WriteLineAsync("Введите номер команды:");
         if (Buttons == null)
         {
@@ -103,14 +103,14 @@ public class Menu : IMenu
         foreach (var button in Buttons)
         {
             await Console.Out.WriteLineAsync($"{button.Key}: {button.Value.Label}");
-            _logger.LogInformation("Показана кнопка: {Key} — {Label}", button.Key, button.Value.Label);
+            _logger.LogDebug("Показана кнопка: {Key} — {Label}", button.Key, button.Value.Label);
         }
     }
     public async Task Close() 
     { 
-        _logger.LogInformation("Закрытие меню: {Label}", Label);
+        _logger.LogDebug("Закрытие меню: {Label}", Label);
         _exitMenu = true; 
         await _cancellationTokenSource.CancelAsync(); 
-        _logger.LogInformation("Меню {Label} закрыто", Label);
+        _logger.LogDebug("Меню {Label} закрыто", Label);
     }
 }

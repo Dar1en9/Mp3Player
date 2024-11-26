@@ -16,7 +16,7 @@ public class DataBaseDeleter: IDataBaseDeleter {
     }
 
     public async Task<bool> DeleteTrack(string id) {
-        _logger.LogInformation("Удаление трека из базы данных по ID: {TrackId}", id);
+        _logger.LogDebug("Удаление трека из базы данных по ID: {TrackId}", id);
         var files = Directory.GetFiles(_path, $"{id}.json", SearchOption.AllDirectories);
         if (files.Length == 0)
         {
@@ -25,11 +25,11 @@ public class DataBaseDeleter: IDataBaseDeleter {
         } 
         var deleteTasks = files.Select(file =>
         {
-            _logger.LogInformation("Удаление файла: {FilePath}", file);
+            _logger.LogDebug("Удаление файла: {FilePath}", file);
             return Task.Run(() => File.Delete(file));
         });
         await Task.WhenAll(deleteTasks);
-        _logger.LogInformation("Трек с ID {TrackId} удален из базы данных", id);
+        _logger.LogDebug("Трек с ID {TrackId} удален из базы данных", id);
         return true;
     }
 }

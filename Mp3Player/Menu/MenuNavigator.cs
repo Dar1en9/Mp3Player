@@ -9,10 +9,10 @@ public class MenuNavigator(ILogger logger) : IMenuNavigator
         AnsiConsole.Clear();
         if (message is not null)
         {
-            logger.LogInformation("Получено сообщение: {Message}", message);
+            logger.LogDebug("Получено сообщение: {Message}", message);
             await Console.Out.WriteLineAsync(message);
         }
-        logger.LogInformation("Навигация к меню: {Menu}", menu.Label);
+        logger.LogDebug("Навигация к меню: {Menu}", menu.Label);
         await menu.Run();
     }
 }

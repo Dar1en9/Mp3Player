@@ -40,18 +40,18 @@ public class AdminPages : IPages
 
     public async Task Run()
     {
-        _logger.LogInformation("Запуск главного меню Admin Pages");
+        _logger.LogDebug("Запуск главного меню Admin Pages");
         await _mainMenu.Run();
-        _logger.LogInformation("Завершение AdminPages");
+        _logger.LogDebug("Завершение AdminPages");
     }
 
     public void Init()
     {
-        _logger.LogInformation("Инициализация AdminPages");
+        _logger.LogDebug("Инициализация AdminPages");
 
         var getAllTracksButton = new Button(_getAllTracksCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _getAllTracksCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _getAllTracksCommand.Description);
             var tracks = await _getAllTracksCommand.Execute();
             await Console.Out.WriteLineAsync("Список всех треков:");
             foreach (var track in tracks)
@@ -61,7 +61,7 @@ public class AdminPages : IPages
 
         var addTrackButton = new Button(_addTrackCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _addTrackCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _addTrackCommand.Description);
             if (await _addTrackCommand.Execute())
                 await Console.Out.WriteLineAsync("Трек успешно добавлен");
             await _mainMenu.Run();
@@ -69,7 +69,7 @@ public class AdminPages : IPages
 
         var deleteTrackButton = new Button(_deleteTrackCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _deleteTrackCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _deleteTrackCommand.Description);
             if (await _deleteTrackCommand.Execute())
                 await Console.Out.WriteLineAsync("Трек успешно удалён");
             await _mainMenu.Run();
@@ -77,7 +77,7 @@ public class AdminPages : IPages
 
         var exitButton = new Button(_exitCommand.Description, async () =>
         {
-            _logger.LogInformation("Выполнение кнопки: {Description}", _exitCommand.Description);
+            _logger.LogDebug("Выполнение кнопки: {Description}", _exitCommand.Description);
             await _exitCommand.Execute();
         });
 
@@ -90,6 +90,6 @@ public class AdminPages : IPages
         };
 
         _mainMenu.Buttons = mainMenuButtons;
-        _logger.LogInformation("AdminPages инициализирован");
+        _logger.LogDebug("AdminPages инициализирован");
     }
 }

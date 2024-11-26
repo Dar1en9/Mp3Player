@@ -32,13 +32,13 @@ public class FindTracksCommand: ICommand<List<Track>, string>
 
     public async Task<List<Track>> Execute(string? arg = default)
     {
-        _logger.LogInformation("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Выполнение команды: {Description}", Description);
         var professor = await _professorReader.GetInput();
         _logger.LogInformation("Получено имя преподавателя: {Professor}", professor);
         await _historyManager.WriteHistory(professor);
-        _logger.LogInformation("История поиска обновлена");
+        _logger.LogDebug("История поиска обновлена");
         var tracks = await _dataBaseReader.GetProfessorTracks(professor);
-        _logger.LogInformation("Получены треки ({amount}) для преподавателя: {Professor}", tracks.Count, professor);
+        _logger.LogDebug("Получены треки ({amount}) для преподавателя: {Professor}", tracks.Count, professor);
         return tracks;
     }
 }

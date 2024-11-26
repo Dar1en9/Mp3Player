@@ -11,27 +11,27 @@ public class ProgramRunner(string[] args, ILogger<ProgramRunner> logger): IProgr
 
     public async Task Run()
     {
-        logger.LogInformation("Запуск программы");
+        logger.LogDebug("Запуск программы");
         if (!Directory.Exists(_path))
         {
-            logger.LogInformation("Создание директории: {Path}", _path);
+            logger.LogDebug("Создание директории: {Path}", _path);
             Directory.CreateDirectory(_path);
         }
         var storagePath = Path.Combine(_path, "Storage");
         if (!Directory.Exists(storagePath))
         {
-            logger.LogInformation("Создание директории: {StoragePath}", storagePath);
+            logger.LogDebug("Создание директории: {StoragePath}", storagePath);
             Directory.CreateDirectory(storagePath);
         }
 
         if (args.Contains("admin"))
         {
-            logger.LogInformation("Запуск AdminPages");
+            logger.LogDebug("Запуск AdminPages");
             await new AdminPages(storagePath, logger).Run();
         }
         else
         {
-            logger.LogInformation("Запуск UserPages");
+            logger.LogDebug("Запуск UserPages");
             await new UserPages(storagePath, _path, logger).Run();
         }
     }
