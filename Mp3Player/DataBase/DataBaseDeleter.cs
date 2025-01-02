@@ -15,7 +15,7 @@ public class DataBaseDeleter: IDataBaseDeleter {
     {
         _logger.LogDebug("Удаление трека из базы данных по ID: {TrackId}", id);
         var parameters = new DynamicParameters();
-        parameters.Add("Id", id);
+        parameters.Add("Id", Guid.Parse(id));
         var rowsDeleted = await _dbService.ExecuteAsync("DELETE FROM Tracks WHERE Id = @Id", parameters);
         if (rowsDeleted == 0)
         {
