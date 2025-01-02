@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Mp3Player.Menu;
+﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using Mp3Player.Menu.Pages;
+using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Runners;
 
@@ -12,6 +13,7 @@ public class ProgramRunner(string[] args, ILogger<ProgramRunner> logger): IProgr
     public async Task Run()
     {
         logger.LogDebug("Запуск программы");
+        SqlMapper.AddTypeHandler(new TrackIdTypeHandler());
         if (!Directory.Exists(_path))
         {
             logger.LogDebug("Создание директории: {Path}", _path);
