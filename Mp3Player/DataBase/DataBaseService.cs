@@ -4,7 +4,7 @@ using System.Data;
 using Npgsql;
 using Dapper;
 
-public class DbService
+public class DataBaseService
 {
     private readonly string _connectionString = ConfigBuilder.AppConfigSettings.DefaultConnection;
     private async Task<IDbConnection> GetConnection()

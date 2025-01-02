@@ -1,34 +1,27 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
-using Mp3Player.TrackHandler;
 
 namespace Mp3Player.DataBase;
 
-public class DataBaseDeleter: IDataBaseDeleter {
-    private readonly string _path;
+public class DataBaseDeleter: IDataBaseDeleter { 
+    private readonly DataBaseService _dbService;
     private readonly ILogger _logger;
     
-    public DataBaseDeleter(string path, ILogger logger) {
-        _path = path;
+    public DataBaseDeleter(DataBaseService dbService, ILogger logger) {
+        _dbService = dbService;
         _logger = logger;
     }
-
-    public async Task<bool> DeleteTrack(string id) {
+    public async Task<bool> DeleteTrack(string id)
+    {
         _logger.LogDebug("Удаление трека из базы данных по ID: {TrackId}", id);
-        var files = Directory.GetFiles(_path, $"{id}.json", SearchOption.AllDirectories);
-        if (files.Length == 0)
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", id);
+        var rowsDeleted = await _dbService.ExecuteAsync("DELETE FROM Tracks WHERE Id = @Id", parameters);
+        if (rowsDeleted == 0)
         {
             _logger.LogWarning("Трека с ID {TrackId} нет в базе данных", id);
             return false;
-        } 
-        var deleteTasks = files.Select(file =>
-        {
-            _logger.LogDebug("Удаление файла: {FilePath}", file);
-            return Task.Run(() => File.Delete(file));
-        });
-        await Task.WhenAll(deleteTasks);
+        }
         _logger.LogDebug("Трек с ID {TrackId} удален из базы данных", id);
         return true;
     }
