@@ -1,28 +1,34 @@
 ﻿using System.Text.Json;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Mp3Player.TrackHandler;
 
 namespace Mp3Player.DataBase;
-
-public class DataBaseWriter: IDataBaseWriter {
-    private readonly string _path;
+public class DataBaseWriter : IDataBaseWriter
+{
+    private readonly DataBaseService _dbService;
     private readonly ILogger _logger;
-    public DataBaseWriter(string path, ILogger logger) {
-        _path = path;
+
+    public DataBaseWriter(DataBaseService dbService, ILogger logger)
+    {
+        _dbService = dbService;
         _logger = logger;
     }
-    public async Task WriteTrack(Track track) {
+
+    public async Task WriteTrack(Track track)
+    {
         _logger.LogDebug("Запись в базу данных трека с ID: {TrackId}", track.Id);
-        var directory = Path.Combine(_path, track.Professor);
-        if (!Directory.Exists(directory))
-        {
-            _logger.LogDebug("Создание директории: {Directory}", directory);
-            Directory.CreateDirectory(directory);
-        }
-        var objectSerialized = JsonSerializer.Serialize(track);
-        _logger.LogDebug("Трек сериализован: {SerializedTrack}", objectSerialized);
-        var filePath = Path.Combine(directory, $"{track.Id}.json");
-        await File.WriteAllTextAsync(filePath, objectSerialized);
-        _logger.LogDebug("Трек: {track} Записан в файл: {FilePath}", track, filePath);
+        const string query = @"
+            INSERT INTO Tracks (Id, Professor, TrackName, AudioPath)
+            VALUES (@Id, @Professor, @TrackName, @AudioPath)
+            ON CONFLICT (Id) DO UPDATE
+            SET Professor = EXCLUDED.Professor, TrackName = EXCLUDED.TrackName, AudioPath = EXCLUDED.AudioPath";
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", track.Id);
+        parameters.Add("Professor", track.Professor);
+        parameters.Add("TrackName", track.TrackName);
+        parameters.Add("AudioPath", track.AudioPath);
+        await _dbService.ExecuteAsync(query, parameters);
+        _logger.LogDebug("Трек: {track} записан в базу данных", track);
     }
 }

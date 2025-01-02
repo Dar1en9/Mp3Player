@@ -1,55 +1,47 @@
-﻿using System.Text.Json;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using Mp3Player.TrackHandler;
 namespace Mp3Player.DataBase;
-
-public class DataBaseReader: IDataBaseReader {
-    private readonly string _path;
-    private readonly JsonSerializerOptions _options;
+public class DataBaseReader : IDataBaseReader
+{
+    private readonly DataBaseService _databaseService;
     private readonly ILogger _logger;
 
-    public DataBaseReader(string path, ILogger logger) {
-        _path = path;
+    public DataBaseReader(DataBaseService dbService, ILogger logger)
+    {
+        _databaseService = dbService;
         _logger = logger;
-        _options = new JsonSerializerOptions
-        {
-            Converters = { new TrackIdJsonConverter(_logger) }
-        };
     }
 
-    public async Task<List<Track>> ReadAllTracks() {
+    public async Task<List<Track>> ReadAllTracks()
+    {
         _logger.LogDebug("Чтение всех треков из базы данных");
-        var professorsFolders = Directory.GetDirectories(_path);
-        var tracks = new List<Track>();
-        foreach (var professorFolder in professorsFolders)
-        {
-            tracks.AddRange(await GetProfessorTracks(professorFolder));
-        }
+        var tracks = (await _databaseService.QueryAsync<Track>("SELECT * FROM Tracks")).ToList();
         _logger.LogDebug("Все треки ({amount}) успешно прочитаны", tracks.Count);
         return tracks;
     }
 
-    public async Task<List<Track>> GetProfessorTracks(string professorFolder) {
-        _logger.LogDebug("Чтение треков для преподавателя: {ProfessorFolder}", professorFolder);
-        var tracks = new List<Track>();
-        var directory = Path.Combine(_path, professorFolder);
-        if (!Directory.Exists(directory))
-        {
-            _logger.LogWarning("Директория не найдена: {Directory}", directory);
-            return tracks;
-        }
-        var tracksPaths = Directory.GetFiles(directory);
-        foreach (var trackPath in tracksPaths)
-            tracks.Add(await GetTrack(trackPath));
-        _logger.LogDebug("Треки для преподавателя {ProfessorFolder} ({amount}) успешно прочитаны", 
-            professorFolder, tracks.Count);
+    public async Task<List<Track>> GetProfessorTracks(string professor)
+    {
+        _logger.LogDebug("Чтение треков для преподавателя: {Professor}", professor);
+        var parameters = new DynamicParameters();
+        parameters.Add("Professor", professor);
+        var tracks = (await _databaseService.QueryAsync<Track>("SELECT * FROM Tracks WHERE Professor = @Professor", parameters)).ToList();
+        _logger.LogDebug("Треки для преподавателя {Professor} ({amount}) успешно прочитаны", professor, tracks.Count);
         return tracks;
     }
-    
-    public async Task<Track> GetTrack(string trackPath) {
-        _logger.LogDebug("Чтение трека из файла: {TrackPath}", trackPath);
-        await using var openStream = File.OpenRead(trackPath);
-        var track = await JsonSerializer.DeserializeAsync<Track>(openStream, _options) ?? throw new InvalidOperationException();
+
+    public async Task<Track> GetTrack(string id)
+    {
+        _logger.LogDebug("Чтение трека из базы данных по ID: {TrackId}", id);
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", id);
+        var track = (await _databaseService.QueryAsync<Track>("SELECT * FROM Tracks WHERE Id = @Id", parameters)).FirstOrDefault();
+        if (track == null)
+        {
+            _logger.LogWarning("Трек с ID {TrackId} не найден", id);
+            throw new InvalidOperationException();
+        }
         _logger.LogDebug("Трек успешно прочитан: {Track}", track);
         return track;
     }

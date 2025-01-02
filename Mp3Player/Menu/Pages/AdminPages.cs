@@ -21,9 +21,10 @@ public class AdminPages : IPages
     public AdminPages(string storageDirectory, ILogger logger)
     {
         _logger = logger;
-        var dataBaseWriter = new DataBaseWriter(storageDirectory, logger);
-        var dataBaseReader = new DataBaseReader(storageDirectory, logger);
-        var dataBaseDeleter = new DataBaseDeleter(storageDirectory, logger);
+        var dbService = new DataBaseService();
+        var dataBaseWriter = new DataBaseWriter(dbService, logger);
+        var dataBaseReader = new DataBaseReader(dbService, logger);
+        var dataBaseDeleter = new DataBaseDeleter(dbService, logger);
         var commandReader = new CommandReader(logger);
         var professorReader = new ProfessorReader(logger);
         var trackNameReader = new TrackNameReader(logger);

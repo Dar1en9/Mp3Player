@@ -32,7 +32,7 @@ public class UserPages: IPages
     public UserPages(string storageDirectory, string historyDirectory, ILogger logger)
     {
         _logger = logger;
-        var dataBaseReader = new DataBaseReader(storageDirectory, logger);
+        var dataBaseReader = new DataBaseReader(new DataBaseService(), logger);
         var professorReader = new ProfessorReader(logger);
         var commandReader = new CommandReader(logger);
         var historyManager = new HistoryManager(historyDirectory, logger);
