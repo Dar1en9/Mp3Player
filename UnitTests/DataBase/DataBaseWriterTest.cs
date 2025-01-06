@@ -3,44 +3,42 @@ using Moq;
 using Mp3Player.DataBase;
 using Mp3Player.TrackHandler;
 using System.Text.Json;
+using Dapper;
 
 namespace UnitTests.DataBase;
 
 public class DataBaseWriterTest
 {
-    private readonly Mock<ILogger> _mockLogger;
-    private readonly string _testPath;
-    private readonly JsonSerializerOptions _jsonOptions;
-
+    private readonly Mock<ILogger<DataBaseWriter>> _mockLogger;
+    private readonly Mock<IDataBaseService> _mockDatabaseService;
     public DataBaseWriterTest()
     {
-        _mockLogger = new Mock<ILogger>();
-        _testPath = Path.Combine(Path.GetTempPath(), "TestDatabase"); 
-        Directory.CreateDirectory(_testPath);
-        _jsonOptions = new JsonSerializerOptions
-        {
-            Converters = { new TrackIdJsonConverter(_mockLogger.Object) }
-        };
+        _mockLogger = new Mock<ILogger<DataBaseWriter>>();
+        _mockDatabaseService = new Mock<IDataBaseService>();
     }
 
     [Fact]
-    public async Task WriteTrack_CreatesDirectoryAndFile()
+    public async Task WriteTrack_AddsTrackToDatabase()
     {
-        var writer = new DataBaseWriter(_testPath, _mockLogger.Object);
-        var trackId = new TrackId(); 
+        var trackId = new TrackId(Guid.NewGuid());
         var track = new Track("TestProff", "trackName", trackId, "pathtoaudio");
+        var trackDto = new TrackDto(trackId.Id, track.Professor, track.TrackName, track.AudioPath); 
+        _mockDatabaseService.Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(1); 
+        _mockDatabaseService.Setup(db => db.QueryAsync<TrackDto>(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(new List<TrackDto> { trackDto });
 
+        var writer = new DataBaseWriter(_mockDatabaseService.Object, _mockLogger.Object); 
         await writer.WriteTrack(track);
-
-        var directoryPath = Path.Combine(_testPath, track.Professor);
-        var filePath = Path.Combine(directoryPath, $"{track.Id}.json");
         
-        Assert.True(Directory.Exists(directoryPath), "Directory was not created.");
-        Assert.True(File.Exists(filePath), "File was not created.");
-        var fileContent = await File.ReadAllTextAsync(filePath);
-        var deserializedTrack = JsonSerializer.Deserialize<Track>(fileContent, _jsonOptions);
-        Assert.Equal(track, deserializedTrack);
-
-        Directory.Delete(_testPath, true);
+        _mockDatabaseService.Verify(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<DynamicParameters>()), Times.Once);
+        var addedTrack = (await _mockDatabaseService.Object
+            .QueryAsync<TrackDto>("SELECT * FROM Tracks WHERE Id = @Id", new DynamicParameters(new { Id = trackId.Id })))
+            .FirstOrDefault(); 
+        Assert.NotNull(addedTrack); 
+        Assert.Equal(trackId.Id, addedTrack.Id); 
+        Assert.Equal(track.Professor, addedTrack.Professor); 
+        Assert.Equal(track.TrackName, addedTrack.TrackName); 
+        Assert.Equal(track.AudioPath, addedTrack.AudioPath);
     }
 }

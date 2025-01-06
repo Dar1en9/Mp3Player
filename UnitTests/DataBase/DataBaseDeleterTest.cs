@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Mp3Player.DataBase;
@@ -8,50 +8,41 @@ namespace UnitTests.DataBase;
 
 public class DataBaseDeleterTest
 {
-    private readonly Mock<ILogger> _mockLogger;
-    private readonly string _testPath;
-    private readonly JsonSerializerOptions _jsonOptions;
+    private readonly Mock<ILogger<DataBaseDeleter>> _mockLogger;
+    private readonly Mock<IDataBaseService> _mockDatabaseService;
 
     public DataBaseDeleterTest()
     {
-        _mockLogger = new Mock<ILogger>();
-        _testPath = Path.Combine(Path.GetTempPath(), "TestDatabase");
-        Directory.CreateDirectory(_testPath);
-        _jsonOptions = new JsonSerializerOptions
-        {
-            Converters = { new TrackIdJsonConverter(_mockLogger.Object) }
-        };
+        _mockLogger = new Mock<ILogger<DataBaseDeleter>>();
+        _mockDatabaseService = new Mock<IDataBaseService>();
     }
 
     [Fact]
-    public async Task DeleteTrack_RemovesFileAndDirectory()
+    public async Task DeleteTrack_RemovesTrackFromDatabase()
     {
-        var trackId = new TrackId();
+        var trackId = new TrackId(Guid.NewGuid());
         var track = new Track("TestProff", "trackName", trackId, "pathtoaudio");
-        var directoryPath = Path.Combine(_testPath, track.Professor);
-        var filePath = Path.Combine(directoryPath, $"{track.Id}.json");
-        Directory.CreateDirectory(directoryPath);
-        await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(track, _jsonOptions));
-
-        var deleter = new DataBaseDeleter(_testPath, _mockLogger.Object);
+        _mockDatabaseService.Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(1); 
         
-        var result = await deleter.DeleteTrack(track.Id.ToString());
-
-        Assert.True(result, "Track was not deleted successfully.");
-        Assert.False(File.Exists(filePath), "File was not deleted.");
-        Assert.True(Directory.Exists(directoryPath), "Directory was deleted.");
+        var deleter = new DataBaseDeleter(_mockDatabaseService.Object, _mockLogger.Object); 
+        var result = await deleter.DeleteTrack(trackId.ToString());
+        
+        Assert.True(result, "Track was not deleted successfully."); 
+        _mockDatabaseService.Verify(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<DynamicParameters>()), Times.Once); 
     }
 
     [Fact]
     public async Task DeleteTrack_TrackDoesNotExist_LogsWarning()
     {
-        var deleter = new DataBaseDeleter(_testPath, _mockLogger.Object);
-        const string nonExistentTrackId = "хехе, такого id нет";
-
-        var result = await deleter.DeleteTrack(nonExistentTrackId);
-
-        Assert.False(result, "Expected deletion to fail for non-existent track.");
+        _mockDatabaseService.Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(0);
         
-        Directory.Delete(_testPath, true);
+        var deleter = new DataBaseDeleter(_mockDatabaseService.Object, _mockLogger.Object); 
+        var nonExistentTrackId = Guid.NewGuid().ToString(); 
+        var result = await deleter.DeleteTrack(nonExistentTrackId);
+        
+        Assert.False(result, "Expected deletion to fail for non-existent track."); 
+        _mockDatabaseService.Verify(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<DynamicParameters>()), Times.Once);
     }
 }

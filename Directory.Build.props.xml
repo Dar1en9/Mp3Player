@@ -1,0 +1,7 @@
+﻿<Project>
+    <PropertyGroup>
+        <CollectCoverage>true</CollectCoverage>
+        <CoverletOutputFormat>opencover</CoverletOutputFormat>
+        <CoverletOutput>$(MSBuildProjectDirectory)\TestResults\</CoverletOutput>
+    </PropertyGroup>
+</Project>

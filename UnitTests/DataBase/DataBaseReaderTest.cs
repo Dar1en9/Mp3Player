@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Mp3Player.DataBase;
@@ -8,73 +9,62 @@ namespace UnitTests.DataBase;
 
 public class DataBaseReaderTest
 {
-    private readonly string _testDirectory;
-    private readonly Mock<ILogger> _loggerMock;
-
+    private readonly Mock<ILogger<DataBaseReader>> _loggerMock;
+    private readonly Mock<IDataBaseService> _mockDatabaseService;
     public DataBaseReaderTest()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "DataBaseReaderTest");
-        Directory.CreateDirectory(_testDirectory);
-        _loggerMock = new Mock<ILogger>();
-    }
+        _loggerMock = new Mock<ILogger<DataBaseReader>>();
+        _mockDatabaseService = new Mock<IDataBaseService>();    }
 
     [Fact]
-    public async Task ReadAllTracks_ShouldReadTracksFromFiles()
+    public async Task ReadAllTracks_ShouldReadTracksFromDatabase()
     {
-        if (Directory.Exists(_testDirectory)) Directory.Delete(_testDirectory, true);
-        Directory.CreateDirectory(_testDirectory);
-        var trackId1 = new TrackId();
-        var trackId2 = new TrackId();
-        var track1 = new Track("TestProff1", "trackName1", trackId1, "pathtoaudio1");
-        var track2 = new Track("TestProff2", "trackName2", trackId2, "pathtoaudio2");
-        var professorFolder1 = Path.Combine(_testDirectory, "Professor1");
-        Directory.CreateDirectory(professorFolder1);
-        await File.WriteAllTextAsync(Path.Combine(professorFolder1, "track1.json"), JsonSerializer.Serialize(track1));
-        await File.WriteAllTextAsync(Path.Combine(professorFolder1, "track2.json"), JsonSerializer.Serialize(track2));
-        var reader = new DataBaseReader(_testDirectory, _loggerMock.Object);
+        var trackId1 = new TrackId(Guid.NewGuid()); 
+        var trackId2 = new TrackId(Guid.NewGuid()); 
+        var trackDto1 = new TrackDto(trackId1.Id, "TestProff1", "trackName1", "pathtoaudio1"); 
+        var trackDto2 = new TrackDto(trackId2.Id, "TestProff2", "trackName2", "pathtoaudio2");
         
+        _mockDatabaseService.Setup(db => db.QueryAsync<TrackDto>(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(new List<TrackDto> { trackDto1, trackDto2 });
+
+        var reader = new DataBaseReader(_mockDatabaseService.Object, _loggerMock.Object);
         var tracks = await reader.ReadAllTracks();
 
         Assert.NotNull(tracks);
         Assert.Equal(2, tracks.Count);
-        Assert.Contains(tracks, t => t.Id.Equals(trackId1));
-        Assert.Contains(tracks, t => t.Id.Equals(trackId2));
+        Assert.Contains(tracks, t => Equals(t.Id, trackId1));
+        Assert.Contains(tracks, t => Equals(t.Id, trackId2));
     }
-    
+
     [Fact]
-    public async Task GetProfessorTracks_ShouldReturnTracks_WhenDirectoryExists()
+    public async Task GetProfessorTracks_ShouldReturnTracks_WhenTracksExist()
     {
-        if (Directory.Exists(_testDirectory)) Directory.Delete(_testDirectory, true);
-        Directory.CreateDirectory(_testDirectory);
-        var trackId = new TrackId(Guid.NewGuid());
-        var track = new Track("TestProff", "trackName", trackId, "pathtoaudio");
-    
-        var professorFolder = Path.Combine(_testDirectory, "Professor1");
-        Directory.CreateDirectory(professorFolder);
-        await File.WriteAllTextAsync(Path.Combine(professorFolder, "track.json"), JsonSerializer.Serialize(track));
-        var reader = new DataBaseReader(_testDirectory, _loggerMock.Object);
-        var tracks = await reader.GetProfessorTracks("Professor1");
+        var trackId1 = new TrackId(Guid.NewGuid()); 
+        var trackDto1 = new TrackDto(trackId1.Id, "TestProff1", "trackName1", "pathtoaudio1"); 
+        _mockDatabaseService.Setup(db => db.QueryAsync<TrackDto>(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(new List<TrackDto> { trackDto1 });
+
+        var reader = new DataBaseReader(_mockDatabaseService.Object, _loggerMock.Object);
+        var tracks = await reader.GetProfessorTracks("TestProff1");
 
         Assert.NotNull(tracks);
         Assert.Single(tracks);
-        Assert.Equal(trackId, tracks[0].Id);
+        Assert.Equal(trackId1, tracks[0].Id);
     }
-    
+
     [Fact]
-    public async Task GetTrack_ShouldReturnTrack_WhenFileExists()
+    public async Task GetTrack_ShouldReturnTrack_WhenTrackExists()
     {
-        if (Directory.Exists(_testDirectory)) Directory.Delete(_testDirectory, true);
-        Directory.CreateDirectory(_testDirectory);
-        var trackId = new TrackId(Guid.NewGuid());
-        var track = new Track("TestProff", "trackName", trackId, "pathtoaudio");
+        var trackId = new TrackId(Guid.NewGuid()); 
+        var trackDto = new TrackDto(trackId.Id, "TestProff", "trackName", "pathtoaudio"); 
+        _mockDatabaseService.Setup(db => db.QueryAsync<TrackDto>(It.IsAny<string>(), It.IsAny<DynamicParameters>())) 
+            .ReturnsAsync(new List<TrackDto> { trackDto });
 
-        var trackFilePath = Path.Combine(_testDirectory, "track.json");
-        await File.WriteAllTextAsync(trackFilePath, JsonSerializer.Serialize(track));
-        var reader = new DataBaseReader(_testDirectory, _loggerMock.Object);
-        var result = await reader.GetTrack(trackFilePath);
-
-        Assert.NotNull(result);
-        Assert.Equal(trackId, result.Id);
-    }
+        var reader = new DataBaseReader(_mockDatabaseService.Object, _loggerMock.Object);
+        var result = await reader.GetTrack(trackId.ToString());
+    
+        Assert.NotNull(result); 
+        Assert.Equal(trackId, result.Id); 
+    } 
 }
 
