@@ -6,6 +6,7 @@ using Mp3Player.Menu.Commands;
 using Mp3Player.Menu.Commands.AdminCommands;
 using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.TrackHandler;
+using Npgsql;
 
 namespace Mp3Player.Menu.Pages;
 
@@ -18,10 +19,10 @@ public class AdminPages : IPages
     private readonly Menu _mainMenu;
     private readonly ILogger _logger;
 
-    public AdminPages(string storageDirectory, ILogger logger)
+    public AdminPages( NpgsqlConnection connection, ILogger logger)
     {
         _logger = logger;
-        var dbService = new DataBaseService();
+        var dbService = new DataBaseService(connection);
         var dataBaseWriter = new DataBaseWriter(dbService, logger);
         var dataBaseReader = new DataBaseReader(dbService, logger);
         var dataBaseDeleter = new DataBaseDeleter(dbService, logger);

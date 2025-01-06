@@ -4,26 +4,23 @@ using System.Data;
 using Npgsql;
 using Dapper;
 
-public class DataBaseService
+public class DataBaseService: IDataBaseService
 {
-    private readonly string _connectionString = ConfigBuilder.AppConfigSettings.DefaultConnection;
-    private async Task<IDbConnection> GetConnection()
+    private readonly IDbConnection _connection;
+
+    public DataBaseService(IDbConnection connection)
     {
-        var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
-        return connection;
+        _connection = connection;
     }
 
     public async Task<IEnumerable<T>> QueryAsync<T>(string sql, DynamicParameters? parameters = null)
     {
-        using var connection = await GetConnection();
-        return await connection.QueryAsync<T>(sql, parameters);
+        return await _connection.QueryAsync<T>(sql, parameters);
     }
 
     public async Task<int> ExecuteAsync(string sql, DynamicParameters? parameters = null)
     {
-        using var connection = await GetConnection();
-        return await connection.ExecuteAsync(sql, parameters);
+        return await _connection.ExecuteAsync(sql, parameters);
     }
 }
 

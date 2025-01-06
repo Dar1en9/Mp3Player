@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Mp3Player.Menu.Pages;
 using Mp3Player.TrackHandler;
+using Npgsql;
 
 namespace Mp3Player.Runners;
 
@@ -13,28 +14,23 @@ public class ProgramRunner(string[] args, ILogger<ProgramRunner> logger): IProgr
     public async Task Run()
     {
         logger.LogDebug("Запуск программы");
-        SqlMapper.AddTypeHandler(new TrackIdTypeHandler());
         if (!Directory.Exists(_path))
         {
             logger.LogDebug("Создание директории: {Path}", _path);
             Directory.CreateDirectory(_path);
         }
-        var storagePath = Path.Combine(_path, "Storage");
-        if (!Directory.Exists(storagePath))
-        {
-            logger.LogDebug("Создание директории: {StoragePath}", storagePath);
-            Directory.CreateDirectory(storagePath);
-        }
-
+        var connectionString = ConfigBuilder.AppConfigSettings.DefaultConnection; 
+        logger.LogDebug("Подключение к базе данных: {DefaultConnection}", connectionString);
+        var connection = new NpgsqlConnection(connectionString);
         if (args.Contains("admin"))
         {
             logger.LogDebug("Запуск AdminPages");
-            await new AdminPages(storagePath, logger).Run();
+            await new AdminPages(connection, logger).Run();
         }
         else
         {
             logger.LogDebug("Запуск UserPages");
-            await new UserPages(storagePath, _path, logger).Run();
+            await new UserPages(connection, _path, logger).Run();
         }
     }
 }

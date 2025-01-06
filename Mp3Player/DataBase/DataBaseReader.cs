@@ -4,10 +4,10 @@ using Mp3Player.TrackHandler;
 namespace Mp3Player.DataBase;
 public class DataBaseReader : IDataBaseReader
 {
-    private readonly DataBaseService _databaseService;
+    private readonly IDataBaseService _databaseService;
     private readonly ILogger _logger;
 
-    public DataBaseReader(DataBaseService dbService, ILogger logger)
+    public DataBaseReader(IDataBaseService dbService, ILogger logger)
     {
         _databaseService = dbService;
         _logger = logger;
@@ -49,7 +49,7 @@ public class DataBaseReader : IDataBaseReader
     {
         _logger.LogDebug("Чтение трека из базы данных по ID: {TrackId}", id);
         var parameters = new DynamicParameters();
-        parameters.Add("Id", id);
+        parameters.Add("Id", Guid.Parse(id));
         var trackDto = (await _databaseService.QueryAsync<TrackDto>("SELECT Id, Professor, TrackName, AudioPath FROM Tracks WHERE Id = @Id", parameters)).FirstOrDefault();
         if (trackDto == null)
         {

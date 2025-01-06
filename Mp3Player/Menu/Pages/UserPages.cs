@@ -9,6 +9,7 @@ using Mp3Player.Menu.Commands.PlayerCommands;
 using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.TrackHandler;
 using NetCoreAudio;
+using Npgsql;
 
 namespace Mp3Player.Menu.Pages;
 
@@ -29,10 +30,10 @@ public class UserPages: IPages
     private readonly Button _stopButton;
     private readonly ILogger _logger;
 
-    public UserPages(string storageDirectory, string historyDirectory, ILogger logger)
+    public UserPages( NpgsqlConnection connection, string historyDirectory, ILogger logger)
     {
         _logger = logger;
-        var dataBaseReader = new DataBaseReader(new DataBaseService(), logger);
+        var dataBaseReader = new DataBaseReader(new DataBaseService(connection), logger);
         var professorReader = new ProfessorReader(logger);
         var commandReader = new CommandReader(logger);
         var historyManager = new HistoryManager(historyDirectory, logger);

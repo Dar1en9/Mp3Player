@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 namespace Mp3Player.DataBase;
 
 public class DataBaseDeleter: IDataBaseDeleter { 
-    private readonly DataBaseService _dbService;
+    private readonly IDataBaseService _dbService;
     private readonly ILogger _logger;
     
-    public DataBaseDeleter(DataBaseService dbService, ILogger logger) {
+    public DataBaseDeleter(IDataBaseService dbService, ILogger logger) {
         _dbService = dbService;
         _logger = logger;
     }

@@ -6,10 +6,10 @@ using Mp3Player.TrackHandler;
 namespace Mp3Player.DataBase;
 public class DataBaseWriter : IDataBaseWriter
 {
-    private readonly DataBaseService _dbService;
+    private readonly IDataBaseService _dbService;
     private readonly ILogger _logger;
 
-    public DataBaseWriter(DataBaseService dbService, ILogger logger)
+    public DataBaseWriter(IDataBaseService dbService, ILogger logger)
     {
         _dbService = dbService;
         _logger = logger;
