@@ -1,6 +1,0 @@
-﻿services:
-  mp3player:
-    image: mp3player
-    build:
-      context: .
-      dockerfile: Mp3Player/Dockerfile

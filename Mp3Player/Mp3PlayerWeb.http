@@ -1,0 +1,6 @@
+@Mp3Player_HostAddress = http://localhost:5032
+
+GET {{Mp3Player_HostAddress}}/api/run
+Accept: application/json
+
+###
