@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Mp3Player.DataBase;
+﻿using Mp3Player.DataBase;
 using Mp3Player.History;
 using Mp3Player.TrackHandler;
 

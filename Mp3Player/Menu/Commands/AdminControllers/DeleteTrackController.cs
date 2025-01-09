@@ -1,34 +1,38 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using Mp3Player.DataBase;
 using Mp3Player.Exceptions;
 using Mp3Player.InputReaders;
 
-namespace Mp3Player.Menu.Commands.AdminCommands;
+namespace Mp3Player.Menu.Commands.AdminControllers;
 
-public class DeleteTrackCommand: ICommand<bool, string>
+[ApiController]
+[Route("api/[controller]")]
+public class DeleteTrackController : ControllerBase, ICommand<IActionResult, string>
 {
     private readonly IReader<string> _idReader;
     private readonly IDataBaseDeleter _dataBaseDeleter;
-    private readonly ILogger _logger;
+    private readonly ILogger<DeleteTrackController> _logger;
+
     public string Description => "Удалить трек";
 
-    public DeleteTrackCommand(IReader<string> idReader, IDataBaseDeleter dataBaseDeleter, ILogger logger)
+    public DeleteTrackController(IReader<string> idReader, IDataBaseDeleter dataBaseDeleter, ILogger<DeleteTrackController> logger)
     {
         _idReader = idReader;
         _dataBaseDeleter = dataBaseDeleter;
         _logger = logger;
     }
-    
+
     Task IUniCommand.Execute()
     {
         _logger.LogWarning("Выполнение команды {Description} было вызвано " +
-                          "через универсальный интерфейс IUniCommand", Description);
+                           "через универсальный интерфейс IUniCommand", Description);
         return Execute();
     }
     
-    public async Task<bool> Execute(string? arg = default)
+    [HttpDelete("delete")]
+    public async Task<IActionResult> Execute(string? arg = default)
     {
-        _logger.LogDebug("Выполнение команды: {Description}", Description);
+        _logger.LogDebug("Запрос на удаление трека");
         try
         {
             var trackId = await _idReader.GetInput();
@@ -39,19 +43,22 @@ public class DeleteTrackCommand: ICommand<bool, string>
                 throw new NoDataFoundException();
             }
             _logger.LogDebug("Трек с идентификатором {TrackId} успешно удален", trackId);
-            return true;
+            return Ok("Трек успешно удален");
         }
         catch (MissClickException ex)
         {
             _logger.LogDebug("Ошибка: {Message}", ex.Message);
-            await Console.Out.WriteLineAsync(ex.Message);
-            return false;
+            return BadRequest(new { message = ex.Message });
         }
         catch (NoDataFoundException ex)
         {
             _logger.LogWarning("Ошибка: {Message}", ex.Message);
-            await Console.Out.WriteLineAsync(ex.Message);
-            return false;
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Ошибка при удалении трека: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
         }
     }
 }

@@ -2,6 +2,7 @@
 using Mp3Player.DataBase;
 using Mp3Player.InputReaders;
 using Mp3Player.Menu.Buttons;
+using Mp3Player.Menu.Commands.AdminCommands;
 using Mp3Player.Menu.Commands.AdminControllers;
 using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.TrackHandler;
