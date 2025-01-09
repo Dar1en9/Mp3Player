@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Mp3Player.InputReaders;
+﻿using Mp3Player.InputReaders;
 
 namespace Mp3Player.TrackHandler;
 

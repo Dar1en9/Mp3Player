@@ -1,18 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
-using Spectre.Console;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Mp3Player.Menu;
 
-public class MenuNavigator(ILogger logger) : IMenuNavigator
+public class MenuNavigator : IMenuNavigator
 {
-    public async Task NavigateTo(IMenu menu, string? message = default) {
-        AnsiConsole.Clear();
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<MenuNavigator> _logger;
+
+    public MenuNavigator(HttpClient httpClient, ILogger<MenuNavigator> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
+    public async Task<IActionResult> NavigateTo(string menuLabel, string? message = default)
+    {
         if (message is not null)
         {
-            logger.LogDebug("Получено сообщение: {Message}", message);
-            await Console.Out.WriteLineAsync(message);
+            _logger.LogDebug("Получено сообщение: {Message}", message);
+            return new JsonResult(new { message });
         }
-        logger.LogDebug("Навигация к меню: {Menu}", menu.Label);
-        await menu.Run();
+
+        _logger.LogDebug("Навигация к меню: {MenuLabel}", menuLabel);
+
+        var response = await _httpClient.GetAsync($"api/menu/show?label={menuLabel}");
+        if (response.IsSuccessStatusCode)
+        {
+            var buttons = await response.Content.ReadFromJsonAsync<Dictionary<int, string>>();
+            if (buttons != null) return new JsonResult(new { menuLabel, buttons });
+            _logger.LogWarning("Ответ не содержит кнопок для меню: {MenuLabel}", menuLabel);
+            return new JsonResult(new { message = "Ответ не содержит кнопок для меню." });
+        }
+        _logger.LogError("Ошибка при навигации к меню: {MenuLabel}", menuLabel);
+        return new JsonResult(new { message = "Ошибка при навигации к меню." });
     }
 }

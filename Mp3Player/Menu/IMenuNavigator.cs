@@ -1,6 +1,8 @@
-﻿namespace Mp3Player.Menu;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Mp3Player.Menu;
 
 public interface IMenuNavigator
 {
-    Task NavigateTo(IMenu menu, string? message = default);
+    Task<IActionResult> NavigateTo(string menuLabel, string? message = default);
 }

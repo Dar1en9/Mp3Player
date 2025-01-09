@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using Mp3Player.DataBase;
 using Mp3Player.InputReaders;
 using Mp3Player.Menu.Buttons;
-using Mp3Player.Menu.Commands;
-using Mp3Player.Menu.Commands.AdminCommands;
+using Mp3Player.Menu.Commands.AdminControllers;
 using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.TrackHandler;
 using Npgsql;
@@ -14,14 +13,16 @@ public class AdminPages : IPages
 {
     private readonly GetAllTracksCommand _getAllTracksCommand;
     private readonly AddTrackCommand _addTrackCommand;
-    private readonly DeleteTrackCommand _deleteTrackCommand;
-    private readonly ExitCommand _exitCommand;
-    private readonly Menu _mainMenu;
-    private readonly ILogger _logger;
+    private readonly MenuController _mainMenu;
+    private readonly ILogger<AdminPages> _logger;
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<MenuController> _loggerMenu;
 
-    public AdminPages( NpgsqlConnection connection, ILogger logger)
+    public AdminPages( NpgsqlConnection connection, HttpClient httpClient, ILogger<AdminPages> logger, ILogger<MenuController> loggerMenu)
     {
         _logger = logger;
+        _loggerMenu = loggerMenu;
+        _httpClient = httpClient;
         var dbService = new DataBaseService(connection);
         var dataBaseWriter = new DataBaseWriter(dbService, logger);
         var dataBaseReader = new DataBaseReader(dbService, logger);
@@ -34,9 +35,8 @@ public class AdminPages : IPages
         var trackCreator = new TrackCreator(professorReader, trackNameReader, audioPathReader, _logger);
         _getAllTracksCommand = new GetAllTracksCommand(dataBaseReader, logger);
         _addTrackCommand = new AddTrackCommand(trackCreator, dataBaseWriter, logger);
-        _deleteTrackCommand = new DeleteTrackCommand(idReader, dataBaseDeleter, _logger);
-        _exitCommand = new ExitCommand(logger);
-        _mainMenu = new Menu("Главное меню", commandReader, logger);
+        _mainMenu = new MenuController(_loggerMenu);
+        _mainMenu.Label = "Главное меню";
         Init();
     }
 
@@ -69,29 +69,44 @@ public class AdminPages : IPages
             await _mainMenu.Run();
         });
 
-        var deleteTrackButton = new Button(_deleteTrackCommand.Description, async () =>
-        {
-            _logger.LogDebug("Выполнение кнопки: {Description}", _deleteTrackCommand.Description);
-            if (await _deleteTrackCommand.Execute())
-                await Console.Out.WriteLineAsync("Трек успешно удалён");
-            await _mainMenu.Run();
-        });
-
-        var exitButton = new Button(_exitCommand.Description, async () =>
-        {
-            _logger.LogDebug("Выполнение кнопки: {Description}", _exitCommand.Description);
-            await _exitCommand.Execute();
+        var deleteTrackButton = new Button("Удалить трек", async () => 
+        { 
+            _logger.LogDebug("Выполнение кнопки: Удалить трек"); 
+            var response = await _httpClient.DeleteAsync("api/deletetrack/delete");
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Трек успешно удален");
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync(); 
+                _logger.LogError("Ошибка при удалении трека: {Message}", errorMessage);
+            } 
+            await ShowMainMenu();
         });
 
         var mainMenuButtons = new Dictionary<int, IButton>
         {
             {1, getAllTracksButton},
             {2, addTrackButton},
-            {3, deleteTrackButton},
-            {4, exitButton}
+            {3, deleteTrackButton}
         };
 
         _mainMenu.Buttons = mainMenuButtons;
         _logger.LogDebug("AdminPages инициализирован");
+    }
+
+    private async Task<IActionResult> ShowMainMenu()
+    {
+        _logger.LogDebug("Показ главного меню");
+        var response = await _httpClient.GetAsync($"api/menu/show?label={_mainMenu.Label}");
+        if (response.IsSuccessStatusCode)
+        {
+            var buttons = await response.Content.ReadFromJsonAsync<Dictionary<int, string>>();
+            if (buttons != null) return new JsonResult(new { _mainMenu.Label, buttons });
+        }
+
+        _logger.LogError("Ошибка при навигации к меню: Главное меню");
+        return new JsonResult(new { message = "Ошибка при навигации к меню." });
     }
 }

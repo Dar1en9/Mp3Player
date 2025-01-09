@@ -1,6 +1,8 @@
-﻿namespace Mp3Player.Runners;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Mp3Player.Runners;
 
 public interface IProgramRunner
 {
-    Task Run();
+    Task<IActionResult> Run();
 }

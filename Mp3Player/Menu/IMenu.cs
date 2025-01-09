@@ -6,7 +6,6 @@ public interface IMenu
 {
     public string Label { get; }
     Task<IMenu> Run();
-    Task ButtonClick(IButton button);
-    Task<IButton?> CommandHandler(CancellationToken cancellationToken);
-    Task ShowHelp();
+    Task<IButton?> ButtonClick(int key);
+    Task<Dictionary<int, string>> ShowHelp();
 }
