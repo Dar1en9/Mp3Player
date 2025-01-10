@@ -8,33 +8,22 @@ namespace Mp3Player.Menu.Commands.UserCommands;
 
 public class FindTracksCommand: ICommand<List<Track>, string>
 {
-    private readonly IProfessorReader _professorReader;
     private readonly IDataBaseReader _dataBaseReader;
     private readonly IHistoryManager _historyManager;
-    private readonly ILogger _logger;
+    private readonly ILogger<FindTracksCommand> _logger;
     public string Description => "Найти трек по преподавателю";
 
-    public FindTracksCommand(IProfessorReader professorReader, IDataBaseReader dataBaseReader, 
-        IHistoryManager historyManager, ILogger logger)
+    public FindTracksCommand(IDataBaseReader dataBaseReader, IHistoryManager historyManager, 
+        ILogger<FindTracksCommand> logger)
     {
-        _professorReader = professorReader;
         _dataBaseReader = dataBaseReader;
         _historyManager = historyManager;
         _logger = logger;
     }
-    
-    Task IUniCommand.Execute()
-    {
-        _logger.LogWarning("Выполнение команды {Description} было вызвано " +
-                           "через универсальный интерфейс IUniCommand", Description);
-        return Execute();
-    }
 
-    public async Task<List<Track>> Execute(string? arg = default)
+    public async Task<List<Track>> Execute(string professor)
     {
         _logger.LogDebug("Выполнение команды: {Description}", Description);
-        var professor = await _professorReader.GetInput();
-        _logger.LogInformation("Получено имя преподавателя: {Professor}", professor);
         await _historyManager.WriteHistory(professor);
         _logger.LogDebug("История поиска обновлена");
         var tracks = await _dataBaseReader.GetProfessorTracks(professor);

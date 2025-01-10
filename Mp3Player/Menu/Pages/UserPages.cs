@@ -11,7 +11,7 @@ using NetCoreAudio;
 using Npgsql;
 
 namespace Mp3Player.Menu.Pages;
-
+/*
 public class UserPages: IPages
 {
     private readonly FindTracksCommand _findTrackCommand;
@@ -73,11 +73,16 @@ public class UserPages: IPages
             await _menuNavigator.NavigateTo(_trackListPage.Label);
         });
         Init();
+        _logger.LogWarning("Кнопки главного меню: {Buttons}", 
+            _mainMenu.Buttons == null ? "null" : string.Join(", ", _mainMenu.Buttons.Keys));
+
+
     }
 
     public async Task Run()
     {
         _logger.LogDebug("Запуск главного меню User Pages");
+        _logger.LogWarning("Экземпляр mainMenu: {HashCode}", _mainMenu.GetHashCode());
         await _mainMenu.Run();
         _logger.LogDebug("Завершение UserPages");
     }
@@ -182,3 +187,4 @@ public class UserPages: IPages
         await _menuNavigator.NavigateTo(_trackListPage.Label);
     }
 }
+*/

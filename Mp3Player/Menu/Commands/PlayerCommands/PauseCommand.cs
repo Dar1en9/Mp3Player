@@ -4,26 +4,19 @@ using NetCoreAudio;
 
 namespace Mp3Player.Menu.Commands.PlayerCommands;
 
-public class PauseCommand : ICommand<bool, string>
+public class PauseCommand : IUniCommand<bool>
 {
     private readonly Player _player;
-    private readonly ILogger _logger;
+    private readonly ILogger<PauseCommand> _logger;
     public string Description => "Пауза";
 
-    public PauseCommand(Player player, ILogger logger)
+    public PauseCommand(Player player, ILogger<PauseCommand> logger)
     {
         _player = player;
         _logger = logger;
     }
     
-    Task IUniCommand.Execute()
-    {
-        _logger.LogWarning("Выполнение команды {Description} было вызвано " +
-                           "через универсальный интерфейс IUniCommand", Description);
-        return Execute();
-    }
-    
-    public async Task<bool> Execute(string? arg = default)
+    public async Task<bool> Execute()
     {
         _logger.LogDebug("Выполнение команды: {Description}", Description);
         try
@@ -34,7 +27,7 @@ public class PauseCommand : ICommand<bool, string>
         catch (Exception ex)
         {
             _logger.LogError(ex, "Ошибка при приостановке воспроизведения трека");
-            Console.WriteLine(ex.Message);
+            return false;
         }
         return true;
     }

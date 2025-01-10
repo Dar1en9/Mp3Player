@@ -4,7 +4,7 @@ using Mp3Player.Exceptions;
 using Mp3Player.InputReaders;
 
 namespace Mp3Player.Menu.Commands.AdminControllers;
-
+/*
 [ApiController]
 [Route("api/[controller]")]
 public class DeleteTrackController : ControllerBase, ICommand<IActionResult, string>
@@ -62,3 +62,4 @@ public class DeleteTrackController : ControllerBase, ICommand<IActionResult, str
         }
     }
 }
+*/

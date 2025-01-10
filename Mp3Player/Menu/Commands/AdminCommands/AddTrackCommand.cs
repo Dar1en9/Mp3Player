@@ -4,7 +4,7 @@ using Mp3Player.Exceptions;
 using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.AdminCommands;
-
+/*
 public class AddTrackCommand: ICommand<bool, string>
 {
     private readonly ITrackCreator _trackCreator;
@@ -46,3 +46,4 @@ public class AddTrackCommand: ICommand<bool, string>
         return true;
     }
 }
+*/

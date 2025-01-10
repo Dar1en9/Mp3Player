@@ -4,28 +4,20 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;
 
-public class GetHistoryCommand: ICommand<List<Track>, string>
+public class GetHistoryCommand: IUniCommand<List<Track>>
 {
     private readonly IDataBaseReader _dataBaseReader;
     private readonly IHistoryManager _historyManager;
-    private readonly ILogger _logger;
+    private readonly ILogger<GetHistoryCommand> _logger;
     public string Description => "Вывести последние треки из истории поиска";
 
-    public GetHistoryCommand(IDataBaseReader dataBaseReader, IHistoryManager historyManager, ILogger logger)
+    public GetHistoryCommand(IDataBaseReader dataBaseReader, IHistoryManager historyManager, ILogger<GetHistoryCommand> logger)
     {
         _dataBaseReader = dataBaseReader;
         _historyManager = historyManager;
         _logger = logger;
     }
-
-    Task IUniCommand.Execute()
-    {
-        _logger.LogWarning("Выполнение команды {Description} было вызвано " +
-                          "через универсальный интерфейс IUniCommand", Description);
-        return Execute();
-    }
-    
-    public async Task<List<Track>> Execute(string? arg = default)
+    public async Task<List<Track>> Execute()
     {
         _logger.LogDebug("Выполнение команды: {Description}", Description);
         var history = await _historyManager.GetHistory();

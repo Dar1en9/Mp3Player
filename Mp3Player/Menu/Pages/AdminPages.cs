@@ -9,7 +9,7 @@ using Mp3Player.TrackHandler;
 using Npgsql;
 
 namespace Mp3Player.Menu.Pages;
-
+/*
 public class AdminPages : IPages
 {
     private readonly GetAllTracksCommand _getAllTracksCommand;
@@ -111,3 +111,4 @@ public class AdminPages : IPages
         return new JsonResult(new { message = "Ошибка при навигации к меню." });
     }
 }
+*/

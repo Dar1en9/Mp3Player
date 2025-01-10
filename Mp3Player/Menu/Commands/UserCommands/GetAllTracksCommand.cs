@@ -4,26 +4,19 @@ using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;
 
-public class GetAllTracksCommand: ICommand<List<Track>, string>
+public class GetAllTracksCommand: IUniCommand<List<Track>>
 {
     private readonly IDataBaseReader _dataBaseReader;
-    private readonly ILogger _logger;
+    private readonly ILogger<GetAllTracksCommand> _logger;
     public string Description => "Вывести все существующие треки";
 
-    public GetAllTracksCommand(IDataBaseReader dataBaseReader, ILogger logger)
+    public GetAllTracksCommand(IDataBaseReader dataBaseReader, ILogger<GetAllTracksCommand> logger)
     {
         _dataBaseReader = dataBaseReader;
         _logger = logger;
     }
 
-    Task IUniCommand.Execute()
-    {
-        _logger.LogWarning("Выполнение команды {Description} было вызвано " +
-                           "через универсальный интерфейс IUniCommand", Description);
-        return Execute();
-    }
-    
-    public async Task<List<Track>> Execute(string? arg = default)
+    public async Task<List<Track>> Execute()
     {
         _logger.LogDebug("Выполнение команды: {Description}", Description);
         var tracks = await _dataBaseReader.ReadAllTracks();

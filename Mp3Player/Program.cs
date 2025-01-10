@@ -1,11 +1,17 @@
-﻿using Mp3Player.Menu;
-using Mp3Player.Menu.Pages;
-using Mp3Player.Runners;
+﻿using System.Data;
+using Mp3Player.DataBase;
+using Mp3Player.History;
+using Mp3Player.Menu.Commands;
+using Mp3Player.Menu.Commands.PlayerCommands;
+using Mp3Player.Menu.Commands.UserCommands;
+using Mp3Player.TrackHandler;
+using NetCoreAudio;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 var logLevel = builder.Configuration.GetValue<string>("LOG_LEVEL");
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -14,31 +20,33 @@ builder.Logging.SetMinimumLevel(Enum.TryParse<LogLevel>(logLevel, out var level)
 builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IProgramRunner, ProgramRunnerController>();
-builder.Services.AddTransient<MenuController>();
 
-builder.Services.AddHttpClient<IMenuNavigator, MenuNavigator>();
-builder.Services.AddHttpClient();
-builder.Services.AddTransient<NpgsqlConnection>(sp =>
+builder.Services.AddTransient<IDbConnection>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>(); 
-    var connectionString = configuration.GetValue<string>("DefaultConnection"); 
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
     return new NpgsqlConnection(connectionString);
 });
 
-builder.Services.AddSingleton(sp => new UserPages(
-    sp.GetRequiredService<NpgsqlConnection>(),
-    sp.GetRequiredService<IMenuNavigator>(),
-    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "MP3Player"),
-    sp.GetRequiredService<ILogger<UserPages>>(),
-    sp.GetRequiredService<ILogger<MenuController>>()));
+builder.Services.AddSingleton<IDataBaseService, DataBaseService>();
+builder.Services.AddSingleton<IDataBaseReader, DataBaseReader>();
+builder.Services.AddSingleton<Player>();
+builder.Services.AddSingleton<IHistoryManager, HistoryManager>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var path = configuration["HistorySettings:Path"] ?? Path.Combine(Environment
+        .GetFolderPath(Environment.SpecialFolder.MyMusic), "MP3Player");
+    var logger = sp.GetRequiredService<ILogger<HistoryManager>>();
+    return new HistoryManager(path, logger);
+});
 
-builder.Services.AddSingleton(sp => new AdminPages(
-    sp.GetRequiredService<NpgsqlConnection>(),
-    sp.GetRequiredService<HttpClient>(),
-    sp.GetRequiredService<ILogger<AdminPages>>(),
-    sp.GetRequiredService<ILogger<MenuController>>()));
-
+builder.Services.AddSingleton<ICommand<List<Track>, string>, FindTracksCommand>();
+builder.Services.AddSingleton<IUniCommand<List<Track>>, GetAllTracksCommand>();
+builder.Services.AddSingleton<IUniCommand<List<Track>>, GetHistoryCommand>();
+builder.Services.AddSingleton<ICommand<bool, Track>, PlayCommand>();
+builder.Services.AddSingleton<IUniCommand<bool>, PauseCommand>();
+builder.Services.AddSingleton<IUniCommand<bool>, ResumeCommand>();
+builder.Services.AddSingleton<IUniCommand<bool>, StopCommand>();
 
 
 var app = builder.Build();
@@ -54,7 +62,6 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/", () => "API works"); 
 app.MapControllers(); 
 app.Run();
-
 /*
 CreateHostBuilder(args).Build().Run(); //предложил copilot со starup.cs
 return;

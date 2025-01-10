@@ -5,6 +5,7 @@ using Npgsql;
 
 namespace Mp3Player.Runners;
 
+/*
 [ApiController]
 [Route("api/run")]
 public class ProgramRunnerController : ControllerBase, IProgramRunner
@@ -44,3 +45,4 @@ public class ProgramRunnerController : ControllerBase, IProgramRunner
         return Ok("UserPages запущен");
     }
 }
+*/

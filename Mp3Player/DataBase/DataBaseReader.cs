@@ -5,9 +5,9 @@ namespace Mp3Player.DataBase;
 public class DataBaseReader : IDataBaseReader
 {
     private readonly IDataBaseService _databaseService;
-    private readonly ILogger _logger;
+    private readonly ILogger<DataBaseReader> _logger;
 
-    public DataBaseReader(IDataBaseService dbService, ILogger logger)
+    public DataBaseReader(IDataBaseService dbService, ILogger<DataBaseReader> logger)
     {
         _databaseService = dbService;
         _logger = logger;

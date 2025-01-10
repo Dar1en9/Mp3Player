@@ -4,6 +4,7 @@ using Mp3Player.Menu.Buttons;
 
 namespace Mp3Player.Menu;
 
+/*
 [ApiController]
 [Route("api/[controller]")]
 public class MenuController : ControllerBase, IMenu
@@ -45,8 +46,11 @@ public class MenuController : ControllerBase, IMenu
     [HttpPost("run")]
     public async Task<IActionResult> Run()
     {
-        _logger.LogDebug("Запуск меню: {Label}", Label); 
+        _logger.LogDebug("Запуск меню: {Label}", Label);
+        _logger.LogWarning("Экземпляр MenuController: {Label}", Label);
         var buttons = await ShowHelp(); 
+        _logger.LogWarning("Кнопки в MenuController при запуске: {Buttons}", 
+            Buttons == null ? "null" : string.Join(", ", Buttons.Keys));
         _logger.LogDebug("Показаны все кнопки меню"); 
         return Ok(buttons);
     }
@@ -87,3 +91,5 @@ public class MenuController : ControllerBase, IMenu
         return await Task.FromResult(buttonDescriptions);
     }
 }
+*/
+

@@ -5,9 +5,9 @@ namespace Mp3Player.History;
 public class HistoryManager: IHistoryManager
 {
     private readonly string _fullPath;
-    private readonly ILogger _logger;
+    private readonly ILogger<HistoryManager> _logger;
 
-    public HistoryManager(string path, ILogger logger)
+    public HistoryManager(string path, ILogger<HistoryManager> logger)
     {
         _fullPath = Path.Combine(path, "history.txt");
         _logger = logger;
