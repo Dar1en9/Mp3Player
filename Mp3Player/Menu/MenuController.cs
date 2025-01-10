@@ -42,14 +42,16 @@ public class MenuController : ControllerBase, IMenu
         return Ok("Кнопка нажата");
     }
 
-    public async Task<IMenu> Run()
+    [HttpPost("run")]
+    public async Task<IActionResult> Run()
     {
-        _logger.LogDebug("Запуск меню: {Label}", Label);
-        await ShowHelp(); 
-        _logger.LogDebug("Показаны все кнопки меню");
-        return this;
+        _logger.LogDebug("Запуск меню: {Label}", Label); 
+        var buttons = await ShowHelp(); 
+        _logger.LogDebug("Показаны все кнопки меню"); 
+        return Ok(buttons);
     }
 
+    [HttpPost("buttonclick")]
     public async Task<IButton?> ButtonClick(int buttonKey)
     {
         if (Buttons != null && Buttons.TryGetValue(buttonKey, out var button))
@@ -59,13 +61,12 @@ public class MenuController : ControllerBase, IMenu
             _logger.LogDebug("Обработка кнопки {ButtonLabel} выполнена", button.Label);
             return button;
         }
-        else
-        {
-            _logger.LogWarning("Кнопка с ключом {ButtonKey} не найдена", buttonKey);
-            return null;
-        }
+
+        _logger.LogWarning("Кнопка с ключом {ButtonKey} не найдена", buttonKey);
+        return null;
     }
 
+    [HttpGet("showhelp")]
     public async Task<Dictionary<int, string>> ShowHelp()
     {
         _logger.LogDebug("Показ справки для меню: {Label}", Label);
