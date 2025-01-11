@@ -24,7 +24,7 @@ public class DataBaseWriter : IDataBaseWriter
             ON CONFLICT (Id) DO UPDATE
             SET Professor = EXCLUDED.Professor, TrackName = EXCLUDED.TrackName, AudioPath = EXCLUDED.AudioPath";
         var parameters = new DynamicParameters();
-        parameters.Add("Id", track.Id);
+        parameters.Add("Id", track.Id.Id);
         parameters.Add("Professor", track.Professor);
         parameters.Add("TrackName", track.TrackName);
         parameters.Add("AudioPath", track.AudioPath);
