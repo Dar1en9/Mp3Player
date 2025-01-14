@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Mp3Player.RequestCheckers;
+namespace Mp3Player.RequestHelpers;
 
 public static partial class TrackRequestChecker
 {
