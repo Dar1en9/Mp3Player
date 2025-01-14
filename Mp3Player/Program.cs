@@ -1,5 +1,10 @@
 ﻿using System.Data;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Mp3Player;
 using Mp3Player.DataBase;
 using Mp3Player.History;
 using Mp3Player.Menu.Commands;
@@ -19,8 +24,69 @@ builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(Enum.TryParse<LogLevel>(logLevel, out var level) ? level : LogLevel.None);
 
 builder.Services.AddEndpointsApiExplorer(); 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mp3Player API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Введите JWT токен как Bearer <your_token>"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            []
+        }
+    });
+});
 builder.Services.AddControllers();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "Dar1en9", 
+            ValidAudience = "Mp3PlayerUser",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("snko%4i5s_pm%otrpt8%9ga4hh$((jad+c%1dkcoo&7@aoj9nw")),
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                // Логируйте ошибку
+                Console.WriteLine("Authentication failed: " + context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                // Логируйте успешную валидацию
+                Console.WriteLine("Token validated successfully.");
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireRole("admin")); 
+});
 
 builder.Services.AddTransient<IDbConnection>(sp =>
 {
@@ -29,6 +95,7 @@ builder.Services.AddTransient<IDbConnection>(sp =>
     return new NpgsqlConnection(connectionString);
 });
 
+builder.Services.AddSingleton<TokenGenerator>();
 builder.Services.AddSingleton<IDataBaseService, DataBaseService>();
 builder.Services.AddSingleton<IDataBaseReader, DataBaseReader>();
 builder.Services.AddSingleton<IDataBaseWriter, DataBaseWriter>();
@@ -60,7 +127,18 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapGet("/", () => "API works"); 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("Incoming request: " + context.Request.Path);
+    if (context.Request.Headers.ContainsKey("Authorization"))
+    {
+        Console.WriteLine("Authorization header: " + context.Request.Headers["Authorization"]);
+    }
+    await next.Invoke();
+});
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapGet("/", () => "API works").AllowAnonymous(); 
 app.MapControllers(); 
 app.Run();
 /*
