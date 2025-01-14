@@ -14,7 +14,7 @@ public class PlayerController : ControllerBase
     private readonly IUniCommand<List<Track>> _getHistoryCommand;
     private readonly ICommand<bool, string> _deleteTrackCommand;
     private readonly ICommand<bool, TrackCreatorDto> _addTrackCommand;
-    private readonly ICommand<bool, Track> _playCommand;
+    private readonly ICommand<FileStreamResult, string> _playCommand;
     private readonly IUniCommand<bool> _pauseCommand;
     private readonly IUniCommand<bool> _resumeCommand;
     private readonly IUniCommand<bool> _stopCommand;
@@ -26,7 +26,7 @@ public class PlayerController : ControllerBase
         [FromKeyedServices("history")] IUniCommand<List<Track>> getHistoryCommand,
         [FromKeyedServices("delete")] ICommand<bool, string> deleteTrackCommand,
         [FromKeyedServices("add")] ICommand<bool, TrackCreatorDto> addTrackCommand,
-        [FromKeyedServices("play")] ICommand<bool, Track> playCommand,
+        [FromKeyedServices("play")] ICommand<FileStreamResult, string> playCommand,
         [FromKeyedServices("pause")] IUniCommand<bool> pauseCommand,
         [FromKeyedServices("resume")] IUniCommand<bool> resumeCommand,
         [FromKeyedServices("stop")] IUniCommand<bool> stopCommand,
@@ -105,36 +105,32 @@ public class PlayerController : ControllerBase
         return BadRequest("Данные трека не соответствуют формату");
     }
 
-    [HttpPost("PlayTrack")]
-    public async Task<IActionResult> PlayTrack([FromBody] TrackDto trackDto)
+    [HttpGet("StreamTrack")]
+    public async Task<IActionResult> StreamTrack([FromQuery] string id)
     {
-        _logger.LogDebug("Воспроизведение трека: {TrackName}", trackDto.TrackName);
-        var track = new Track(trackDto.Professor, trackDto.TrackName, new TrackId(trackDto.Id), trackDto.AudioPath);
-        await _playCommand.Execute(track);
-        return Ok("Трек воспроизводится");
-    }
-
-    [HttpPost("PauseTrack")]
-    public async Task<IActionResult> PauseTrack()
-    {
-        _logger.LogDebug("Пауза трека");
-        await _pauseCommand.Execute();
-        return Ok("Трек на паузе");
-    }
-    
-    [HttpPost("ResumeTrack")]
-    public async Task<IActionResult> ResumeTrack()
-    {
-        _logger.LogDebug("Возобновление трека");
-        await _resumeCommand.Execute();
-        return Ok("Трек возобновлен");
-    }
-
-    [HttpPost("StopTrack")]
-    public async Task<IActionResult> StopTrack()
-    {
-        _logger.LogDebug("Остановка трека");
-        await _stopCommand.Execute();
-        return Ok("Трек остановлен");
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            _logger.LogDebug("Пустой id");
+            return BadRequest("Введен пустой id");
+        }
+        if (!Guid.TryParse(id, out _))
+        {
+            _logger.LogDebug("Введен некорректный формат id");
+            return BadRequest("Некорректный формат id");
+        }
+        try
+        {
+            var fileStreamResult = await _playCommand.Execute(id);
+            return fileStreamResult;
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound("Трек с таким ID не найден.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ошибка при воспроизведении трека");
+            return StatusCode(500, "Ошибка на сервере.");
+        }
     }
 }
