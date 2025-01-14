@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Mp3Player.Menu.Commands;
 using Mp3Player.RequestCheckers;
@@ -45,7 +44,7 @@ public class PlayerController : ControllerBase
         if (loginRequest.Username != "admin" || loginRequest.Password != "admin")
         {
             _logger.LogDebug("Неверные имя пользователя или пароль");
-            return Unauthorized("Invalid credentials.");
+            return Unauthorized("Неверные имя пользователя или пароль");
         }
 
         var token = _tokenGenerator.GenerateToken(loginRequest.Username, "admin");

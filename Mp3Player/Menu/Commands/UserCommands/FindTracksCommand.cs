@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Mp3Player.DataBase;
+﻿using Mp3Player.DataBase;
 using Mp3Player.History;
-using Mp3Player.InputReaders;
 using Mp3Player.TrackHandler;
 
 namespace Mp3Player.Menu.Commands.UserCommands;

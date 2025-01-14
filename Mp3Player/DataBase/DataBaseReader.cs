@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Microsoft.Extensions.Logging;
 using Mp3Player.TrackHandler;
 namespace Mp3Player.DataBase;
 public class DataBaseReader : IDataBaseReader

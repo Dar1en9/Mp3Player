@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using Dapper;
-using Microsoft.Extensions.Logging;
+﻿using Dapper;
 using Mp3Player.TrackHandler;
 
 namespace Mp3Player.DataBase;

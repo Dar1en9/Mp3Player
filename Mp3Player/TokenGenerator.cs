@@ -17,9 +17,9 @@ public class TokenGenerator
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, username), 
-            new Claim(ClaimTypes.Role, role), 
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) 
+            new(ClaimTypes.Name, username), 
+            new(ClaimTypes.Role, role), 
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) 
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));

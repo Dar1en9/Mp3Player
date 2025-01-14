@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Mp3Player.DataBase;
+﻿using Mp3Player.DataBase;
 using Mp3Player.Exceptions;
-using Mp3Player.InputReaders;
 
 namespace Mp3Player.Menu.Commands.AdminCommands;
 
