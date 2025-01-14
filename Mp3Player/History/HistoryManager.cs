@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace Mp3Player.History;
+﻿namespace Mp3Player.History;
 
 public class HistoryManager: IHistoryManager
 {
