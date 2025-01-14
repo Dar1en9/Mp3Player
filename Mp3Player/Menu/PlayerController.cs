@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using Mp3Player.Menu.Commands;
 using Mp3Player.RequestCheckers;
 using Mp3Player.TrackHandler;
@@ -15,10 +17,8 @@ public class PlayerController : ControllerBase
     private readonly ICommand<bool, string> _deleteTrackCommand;
     private readonly ICommand<bool, TrackCreatorDto> _addTrackCommand;
     private readonly ICommand<FileStreamResult, string> _playCommand;
-    private readonly IUniCommand<bool> _pauseCommand;
-    private readonly IUniCommand<bool> _resumeCommand;
-    private readonly IUniCommand<bool> _stopCommand;
     private readonly ILogger<PlayerController> _logger;
+    private readonly TokenGenerator _tokenGenerator;
 
     public PlayerController(
         [FromKeyedServices("find")] ICommand<List<Track>, string> findTracksCommand,
@@ -27,10 +27,7 @@ public class PlayerController : ControllerBase
         [FromKeyedServices("delete")] ICommand<bool, string> deleteTrackCommand,
         [FromKeyedServices("add")] ICommand<bool, TrackCreatorDto> addTrackCommand,
         [FromKeyedServices("play")] ICommand<FileStreamResult, string> playCommand,
-        [FromKeyedServices("pause")] IUniCommand<bool> pauseCommand,
-        [FromKeyedServices("resume")] IUniCommand<bool> resumeCommand,
-        [FromKeyedServices("stop")] IUniCommand<bool> stopCommand,
-        ILogger<PlayerController> logger)
+        ILogger<PlayerController> logger, TokenGenerator tokenGenerator)
     {
         _findTracksCommand = findTracksCommand;
         _getAllTracksCommand = getAllTracksCommand;
@@ -38,12 +35,24 @@ public class PlayerController : ControllerBase
         _deleteTrackCommand = deleteTrackCommand;
         _addTrackCommand = addTrackCommand;
         _playCommand = playCommand;
-        _pauseCommand = pauseCommand;
-        _resumeCommand = resumeCommand;
-        _stopCommand = stopCommand;
         _logger = logger;
+        _tokenGenerator = tokenGenerator;
     }
 
+    [HttpPost("GetAdminToken")]
+    public IActionResult Login([FromBody] LoginRequest loginRequest)
+    {
+        if (loginRequest.Username != "admin" || loginRequest.Password != "admin")
+        {
+            _logger.LogDebug("Неверные имя пользователя или пароль");
+            return Unauthorized("Invalid credentials.");
+        }
+
+        var token = _tokenGenerator.GenerateToken(loginRequest.Username, "admin");
+        _logger.LogDebug("Успешная авторизация и получение токена");
+        return Ok(new { Token = token });
+    }
+    
     [HttpGet("FindTracks")]
     public async Task<IActionResult> FindTracks([FromQuery] string professor)
     {
@@ -77,6 +86,7 @@ public class PlayerController : ControllerBase
     }
     
     [HttpPost("DeleteTrack")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> DeleteTrack([FromQuery] string id)
     {
         if (string.IsNullOrWhiteSpace(id))
@@ -97,6 +107,7 @@ public class PlayerController : ControllerBase
     }
     
     [HttpPost("AddTrack")]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> AddTrack([FromBody] TrackCreatorDto trackCreatorDto)
     {
         _logger.LogDebug("Добавление трека");
