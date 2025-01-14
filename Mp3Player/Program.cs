@@ -2,6 +2,7 @@
 using Mp3Player.DataBase;
 using Mp3Player.History;
 using Mp3Player.Menu.Commands;
+using Mp3Player.Menu.Commands.AdminCommands;
 using Mp3Player.Menu.Commands.PlayerCommands;
 using Mp3Player.Menu.Commands.UserCommands;
 using Mp3Player.TrackHandler;
@@ -30,6 +31,8 @@ builder.Services.AddTransient<IDbConnection>(sp =>
 
 builder.Services.AddSingleton<IDataBaseService, DataBaseService>();
 builder.Services.AddSingleton<IDataBaseReader, DataBaseReader>();
+builder.Services.AddSingleton<IDataBaseWriter, DataBaseWriter>();
+builder.Services.AddSingleton<IDataBaseDeleter, DataBaseDeleter>();
 builder.Services.AddSingleton<Player>();
 builder.Services.AddSingleton<IHistoryManager, HistoryManager>(sp =>
 {
@@ -40,13 +43,15 @@ builder.Services.AddSingleton<IHistoryManager, HistoryManager>(sp =>
     return new HistoryManager(path, logger);
 });
 
-builder.Services.AddSingleton<ICommand<List<Track>, string>, FindTracksCommand>();
-builder.Services.AddSingleton<IUniCommand<List<Track>>, GetAllTracksCommand>();
-builder.Services.AddSingleton<IUniCommand<List<Track>>, GetHistoryCommand>();
-builder.Services.AddSingleton<ICommand<bool, Track>, PlayCommand>();
-builder.Services.AddSingleton<IUniCommand<bool>, PauseCommand>();
-builder.Services.AddSingleton<IUniCommand<bool>, ResumeCommand>();
-builder.Services.AddSingleton<IUniCommand<bool>, StopCommand>();
+builder.Services.AddKeyedSingleton<ICommand<List<Track>, string>, FindTracksCommand>("find");
+builder.Services.AddKeyedSingleton<IUniCommand<List<Track>>, GetHistoryCommand>("history");
+builder.Services.AddKeyedSingleton<IUniCommand<List<Track>>, GetAllTracksCommand>("all");
+builder.Services.AddKeyedSingleton<ICommand<bool, string>, DeleteTrackCommand>("delete");
+builder.Services.AddKeyedSingleton<ICommand<bool, TrackCreatorDto>, AddTrackCommand>("add");
+builder.Services.AddKeyedSingleton<ICommand<bool, Track>, PlayCommand>("play");
+builder.Services.AddKeyedSingleton<IUniCommand<bool>, PauseCommand>("pause");
+builder.Services.AddKeyedSingleton<IUniCommand<bool>, ResumeCommand>("resume");
+builder.Services.AddKeyedSingleton<IUniCommand<bool>, StopCommand>("stop");
 
 
 var app = builder.Build();

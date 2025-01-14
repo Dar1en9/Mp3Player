@@ -5,9 +5,9 @@ namespace Mp3Player.DataBase;
 
 public class DataBaseDeleter: IDataBaseDeleter { 
     private readonly IDataBaseService _dbService;
-    private readonly ILogger _logger;
+    private readonly ILogger<DataBaseDeleter> _logger;
     
-    public DataBaseDeleter(IDataBaseService dbService, ILogger logger) {
+    public DataBaseDeleter(IDataBaseService dbService, ILogger<DataBaseDeleter> logger) {
         _dbService = dbService;
         _logger = logger;
     }
